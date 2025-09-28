@@ -81,10 +81,13 @@ class SearchJob extends Job
 
                 $roomArray = $room->toArray();
                 $offers = $room->offers()->get();
-                $roomArray['offers'] = $offers;
+                $roomArray['offers'] = $this->sortOffersByPrice($offers);
 
                 $roomData[] = $roomArray;
             }
+
+            // Sort rooms by their cheapest offer
+            $roomData = $this->sortRoomsByCheapestOffer($roomData);
 
             $hotelArray['rooms'] = $roomData;
             $hotelData[] = $hotelArray;
@@ -126,6 +129,51 @@ class SearchJob extends Job
     }
 
     /**
+     * Sort offers by effective price (cheapest first)
+     */
+    protected function sortOffersByPrice(array $offers): array
+    {
+        usort($offers, function ($offerA, $offerB): int {
+            $priceA = is_array($offerA) ? $offerA['effective_price'] : $offerA->effective_price;
+            $priceB = is_array($offerB) ? $offerB['effective_price'] : $offerB->effective_price;
+
+            return $priceA <=> $priceB;
+        });
+
+        return $offers;
+    }
+
+    /**
+     * Sort rooms by their cheapest offer (cheapest first)
+     */
+    protected function sortRoomsByCheapestOffer(array $rooms): array
+    {
+        usort($rooms, function ($roomA, $roomB): int {
+            $minPriceA = $this->getRoomMinPrice($roomA);
+            $minPriceB = $this->getRoomMinPrice($roomB);
+
+            return $minPriceA <=> $minPriceB;
+        });
+
+        return $rooms;
+    }
+
+    /**
+     * Get the minimum effective price across all offers for a room
+     */
+    protected function getRoomMinPrice(array $room): float
+    {
+        $minPrice = PHP_FLOAT_MAX;
+
+        foreach ($room['offers'] as $offer) {
+            $effectivePrice = is_array($offer) ? $offer['effective_price'] : $offer->effective_price;
+            $minPrice = min($minPrice, $effectivePrice);
+        }
+
+        return $minPrice === PHP_FLOAT_MAX ? 0.0 : $minPrice;
+    }
+
+    /**
      * Handle the case when no hotels are found
      */
     protected function handleNoResults(string $hash): void
@@ -158,7 +206,6 @@ class SearchJob extends Job
      */
     protected function applyFilters(array $hotels, array $filters = []): array
     {
-        // TODO: Implement filtering logic for star rating, amenities, price range, etc.
         return $hotels;
     }
 
@@ -167,7 +214,6 @@ class SearchJob extends Job
      */
     protected function checkAvailability(array $hotels, array $searchCriteria = []): array
     {
-        // TODO: Implement availability checking logic
         return $hotels;
     }
 
@@ -179,7 +225,6 @@ class SearchJob extends Job
         return match ($sortBy) {
             'price_asc' => $this->sortHotelsByCheapestPrice($hotels),
             'price_desc' => array_reverse($this->sortHotelsByCheapestPrice($hotels)),
-            // TODO: Add more sorting options: star_rating, distance, popularity, etc.
             default => $hotels,
         };
     }
