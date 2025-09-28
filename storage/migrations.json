@@ -2,47 +2,128 @@
     "version": "1.0",
     "migrations": [
         {
-            "id": "mig_f0151b347e31",
-            "sql": "CREATE TABLE \"api_tokens\" (\n  \"user_id\" TEXT NOT NULL,\n  \"name\" TEXT NOT NULL,\n  \"token_hash\" TEXT NOT NULL,\n  \"expires_at\" TEXT,\n  \"last_used_at\" TEXT,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"user_id\") REFERENCES \"users\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
+            "id": "mig_2e403805d93f",
+            "sql": "CREATE TABLE \"api_token\" (\n  \"user_id\" TEXT NOT NULL,\n  \"name\" TEXT NOT NULL,\n  \"token_hash\" TEXT NOT NULL,\n  \"expires_at\" TEXT,\n  \"last_used_at\" TEXT,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"user_id\") REFERENCES \"user\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
             "destructive": false,
-            "generated_at": "2025-09-27T14:19:23+00:00",
-            "table": "api_tokens",
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "api_token",
             "operation": "create_table",
             "warning": null
         },
         {
-            "id": "mig_a684b3eb7c1c",
-            "sql": "CREATE TABLE \"users\" (\n  \"name\" TEXT NOT NULL,\n  \"password\" TEXT NOT NULL,\n  \"email\" TEXT NOT NULL,\n  \"active\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP\n)",
+            "id": "mig_1674c0be7133",
+            "sql": "CREATE TABLE \"hotel\" (\n  \"title\" TEXT NOT NULL,\n  \"description\" TEXT NOT NULL,\n  \"location_id\" CHAR(36) NOT NULL,\n  \"star_rating\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"location_id\") REFERENCES \"location\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
             "destructive": false,
-            "generated_at": "2025-09-27T14:19:23+00:00",
-            "table": "users",
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "hotel",
             "operation": "create_table",
             "warning": null
         },
         {
-            "id": "mig_bfcf39e40148",
-            "sql": "CREATE UNIQUE INDEX \"uniq_api_tokens_token_hash\" ON \"api_tokens\" (\"token_hash\")",
+            "id": "mig_cd6b9cd7d8b2",
+            "sql": "CREATE TABLE \"location\" (\n  \"name\" TEXT NOT NULL,\n  \"city\" TEXT NOT NULL,\n  \"country\" TEXT NOT NULL,\n  \"latitude\" REAL NOT NULL,\n  \"longitude\" REAL NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP\n)",
             "destructive": false,
-            "generated_at": "2025-09-27T14:19:23+00:00",
-            "table": "api_tokens",
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "location",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_9dad8160d607",
+            "sql": "CREATE TABLE \"offer\" (\n  \"room_id\" CHAR(36) NOT NULL,\n  \"price\" REAL NOT NULL,\n  \"discounts\" TEXT NOT NULL,\n  \"effective_price\" REAL NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"room_id\") REFERENCES \"room\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "offer",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_d72ea5e76587",
+            "sql": "CREATE TABLE \"room\" (\n  \"hotel_id\" CHAR(36) NOT NULL,\n  \"category\" TEXT NOT NULL,\n  \"description\" TEXT NOT NULL,\n  \"capacity\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"hotel_id\") REFERENCES \"hotel\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "room",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_3afe2e45adb6",
+            "sql": "CREATE TABLE \"search\" (\n  \"user_id\" CHAR(36) NOT NULL,\n  \"location_id\" CHAR(36) NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"user_id\") REFERENCES \"user\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE,\n  FOREIGN KEY (\"location_id\") REFERENCES \"location\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "search",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_5f0381b6b1bf",
+            "sql": "CREATE TABLE \"user\" (\n  \"name\" TEXT NOT NULL,\n  \"password\" TEXT NOT NULL,\n  \"email\" TEXT NOT NULL,\n  \"active\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "user",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_0c966c4cee0d",
+            "sql": "CREATE UNIQUE INDEX \"uniq_api_token_token_hash\" ON \"api_token\" (\"token_hash\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "api_token",
             "operation": "add_index",
             "warning": null
         },
         {
-            "id": "mig_bf19555b1609",
-            "sql": "CREATE INDEX \"idx_api_tokens_user_id\" ON \"api_tokens\" (\"user_id\")",
+            "id": "mig_15bd0d8e18a4",
+            "sql": "CREATE INDEX \"idx_api_token_user_id\" ON \"api_token\" (\"user_id\")",
             "destructive": false,
-            "generated_at": "2025-09-27T14:19:23+00:00",
-            "table": "api_tokens",
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "api_token",
             "operation": "add_index",
             "warning": null
         },
         {
-            "id": "mig_471ef548fac7",
-            "sql": "CREATE UNIQUE INDEX \"uniq_users_email\" ON \"users\" (\"email\")",
+            "id": "mig_a4efd91a8195",
+            "sql": "CREATE INDEX \"idx_offer_room_id\" ON \"offer\" (\"room_id\")",
             "destructive": false,
-            "generated_at": "2025-09-27T14:19:23+00:00",
-            "table": "users",
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "offer",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_a5efac8b7559",
+            "sql": "CREATE INDEX \"idx_offer_price\" ON \"offer\" (\"price\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "offer",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_db2601e91c72",
+            "sql": "CREATE INDEX \"idx_room_hotel_id\" ON \"room\" (\"hotel_id\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "room",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_b3cd0412ca16",
+            "sql": "CREATE INDEX \"idx_room_category\" ON \"room\" (\"category\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "room",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_967ce4f3fd34",
+            "sql": "CREATE UNIQUE INDEX \"uniq_user_email\" ON \"user\" (\"email\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T18:25:23+00:00",
+            "table": "user",
             "operation": "add_index",
             "warning": null
         },
@@ -50,127 +131,10 @@
             "id": "mig_b93b059a8555",
             "sql": "CREATE TABLE jobs (\n    id TEXT PRIMARY KEY,\n    queue TEXT NOT NULL DEFAULT 'default',\n    payload TEXT NOT NULL,\n    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),\n    attempts INTEGER NOT NULL DEFAULT 0,\n    error TEXT,\n    run_at DATETIME NOT NULL,\n    started_at DATETIME,\n    completed_at DATETIME,\n    failed_at DATETIME,\n    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Create essential indexes for queue performance\nCREATE INDEX jobs_queue_status_run_at_index ON jobs (queue, status, run_at);\nCREATE INDEX jobs_status_run_at_index ON jobs (status, run_at);\nCREATE INDEX jobs_status_index ON jobs (status);",
             "destructive": false,
-            "generated_at": "2025-09-27T14:19:33+00:00",
+            "generated_at": "2025-09-28T18:25:26+00:00",
             "table": "jobs",
             "operation": "create_table",
             "description": "Create jobs table and indexes for queue system"
-        },
-        {
-            "id": "mig_18681b668f9c",
-            "sql": "CREATE TABLE \"hotels\" (\n  \"title\" TEXT NOT NULL,\n  \"description\" TEXT NOT NULL,\n  \"address\" TEXT NOT NULL,\n  \"latitude\" REAL NOT NULL,\n  \"longitude\" REAL NOT NULL,\n  \"star_rating\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP\n)",
-            "destructive": false,
-            "generated_at": "2025-09-28T14:46:42+00:00",
-            "table": "hotels",
-            "operation": "create_table",
-            "warning": null
-        },
-        {
-            "id": "mig_732c3dc17138",
-            "sql": "CREATE TABLE \"offers\" (\n  \"room_id\" CHAR(36) NOT NULL,\n  \"price\" REAL NOT NULL,\n  \"discounts\" TEXT NOT NULL,\n  \"effective_price\" REAL NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"room_id\") REFERENCES \"rooms\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
-            "destructive": false,
-            "generated_at": "2025-09-28T14:58:01+00:00",
-            "table": "offers",
-            "operation": "create_table",
-            "warning": null
-        },
-        {
-            "id": "mig_9520a11e5320",
-            "sql": "CREATE TABLE \"rooms\" (\n  \"hotel_id\" CHAR(36) NOT NULL,\n  \"category\" TEXT NOT NULL,\n  \"description\" TEXT NOT NULL,\n  \"capacity\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"hotel_id\") REFERENCES \"hotels\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
-            "destructive": false,
-            "generated_at": "2025-09-28T14:58:01+00:00",
-            "table": "rooms",
-            "operation": "create_table",
-            "warning": null
-        },
-        {
-            "id": "mig_819808e3e4b0",
-            "sql": "CREATE INDEX \"idx_offers_room_id\" ON \"offers\" (\"room_id\")",
-            "destructive": false,
-            "generated_at": "2025-09-28T14:58:01+00:00",
-            "table": "offers",
-            "operation": "add_index",
-            "warning": null
-        },
-        {
-            "id": "mig_f9663197c6da",
-            "sql": "CREATE INDEX \"idx_offers_price\" ON \"offers\" (\"price\")",
-            "destructive": false,
-            "generated_at": "2025-09-28T14:58:01+00:00",
-            "table": "offers",
-            "operation": "add_index",
-            "warning": null
-        },
-        {
-            "id": "mig_8496b67f26bc",
-            "sql": "CREATE INDEX \"idx_rooms_hotel_id\" ON \"rooms\" (\"hotel_id\")",
-            "destructive": false,
-            "generated_at": "2025-09-28T14:58:01+00:00",
-            "table": "rooms",
-            "operation": "add_index",
-            "warning": null
-        },
-        {
-            "id": "mig_9198a7cd8d0f",
-            "sql": "CREATE INDEX \"idx_rooms_category\" ON \"rooms\" (\"category\")",
-            "destructive": false,
-            "generated_at": "2025-09-28T14:58:01+00:00",
-            "table": "rooms",
-            "operation": "add_index",
-            "warning": null
-        },
-        {
-            "id": "mig_ad97c5b8e235",
-            "sql": "CREATE TABLE \"locations\" (\n  \"name\" TEXT NOT NULL,\n  \"city\" TEXT NOT NULL,\n  \"country\" TEXT NOT NULL,\n  \"latitude\" REAL NOT NULL,\n  \"longitude\" REAL NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP\n)",
-            "destructive": false,
-            "generated_at": "2025-09-28T15:18:42+00:00",
-            "table": "locations",
-            "operation": "create_table",
-            "warning": null
-        },
-        {
-            "id": "mig_969df6a6cf58",
-            "sql": "CREATE TABLE \"searchs\" (\n  \"user_id\" CHAR(36) NOT NULL,\n  \"location_id\" CHAR(36) NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"user_id\") REFERENCES \"users\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE,\n  FOREIGN KEY (\"location_id\") REFERENCES \"locations\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
-            "destructive": false,
-            "generated_at": "2025-09-28T15:18:42+00:00",
-            "table": "searchs",
-            "operation": "create_table",
-            "warning": null
-        },
-        {
-            "id": "mig_cf644e06ce08",
-            "sql": "ALTER TABLE \"hotels\" ADD COLUMN \"location_id\" CHAR(36) NOT NULL",
-            "destructive": false,
-            "generated_at": "2025-09-28T15:18:42+00:00",
-            "table": "hotels",
-            "operation": "add_column",
-            "warning": null
-        },
-        {
-            "id": "mig_8de8262d3f3c",
-            "sql": "ALTER TABLE \"hotels\" DROP COLUMN \"address\"",
-            "destructive": true,
-            "generated_at": "2025-09-28T15:18:42+00:00",
-            "table": "hotels",
-            "operation": "drop_column",
-            "warning": "Dropping column - data will be lost"
-        },
-        {
-            "id": "mig_dcf065bfde64",
-            "sql": "ALTER TABLE \"hotels\" DROP COLUMN \"latitude\"",
-            "destructive": true,
-            "generated_at": "2025-09-28T15:18:42+00:00",
-            "table": "hotels",
-            "operation": "drop_column",
-            "warning": "Dropping column - data will be lost"
-        },
-        {
-            "id": "mig_7f13b9fe174f",
-            "sql": "ALTER TABLE \"hotels\" DROP COLUMN \"longitude\"",
-            "destructive": true,
-            "generated_at": "2025-09-28T15:18:42+00:00",
-            "table": "hotels",
-            "operation": "drop_column",
-            "warning": "Dropping column - data will be lost"
         }
     ]
 }
