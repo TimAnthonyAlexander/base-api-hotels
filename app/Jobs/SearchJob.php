@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Hotel;
 use App\Models\Search;
 use Override;
 use Throwable;
@@ -22,12 +23,16 @@ class SearchJob extends Job
     #[Override]
     public function handle(): void
     {
-        // Implement your job logic here
-        // This method will be called when the job is processed
+        $this->search->status = 'started';
+        $this->search->save();
 
-        // Example:
-        // $this->processData();
-        // $this->sendNotification();
+        $hotels = Hotel::where('location_id', '=', $this->search->location->id)->get();
+
+        if ($hotels === []) {
+            $this->search->status = 'no_results';
+            $this->search->save();
+            return;
+        }
     }
 
     #[Override]
@@ -35,6 +40,7 @@ class SearchJob extends Job
     {
         // Handle job failure (optional)
         // This method is called when the job fails permanently
+        $this->search->status = 'failed';
 
         parent::failed($throwable);
 

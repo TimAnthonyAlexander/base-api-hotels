@@ -19,7 +19,7 @@ class Offer extends BaseModel
 
     public float $price;
 
-    public array $discounts;
+    public float $discount;
 
     public float $effective_price;
 
@@ -77,4 +77,3 @@ class Offer extends BaseModel
     // Eager loading:
     // $modelsWithRelations = Offer::with(['user', 'posts'])->get();
 }
-

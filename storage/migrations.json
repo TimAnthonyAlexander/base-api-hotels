@@ -171,6 +171,24 @@
             "table": "search",
             "operation": "add_column",
             "warning": null
+        },
+        {
+            "id": "mig_fb82a5724bee",
+            "sql": "ALTER TABLE \"offer\" ADD COLUMN \"discount\" REAL NOT NULL DEFAULT 0.0",
+            "destructive": false,
+            "generated_at": "2025-09-28T20:07:38+00:00",
+            "table": "offer",
+            "operation": "add_column",
+            "warning": null
+        },
+        {
+            "id": "mig_09340cac363a",
+            "sql": "ALTER TABLE \"offer\" DROP COLUMN \"discounts\"",
+            "destructive": true,
+            "generated_at": "2025-09-28T20:07:38+00:00",
+            "table": "offer",
+            "operation": "drop_column",
+            "warning": "Dropping column - data will be lost"
         }
     ]
 }
