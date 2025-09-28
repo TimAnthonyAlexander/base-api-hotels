@@ -13,11 +13,7 @@ final class Hotel extends BaseModel
 
     public string $description;
 
-    public string $address;
-
-    public float $latitude;
-
-    public float $longitude;
+    public Location $location;
 
     public int $star_rating; // 1 to 5
 

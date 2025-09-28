@@ -117,6 +117,60 @@
             "table": "rooms",
             "operation": "add_index",
             "warning": null
+        },
+        {
+            "id": "mig_ad97c5b8e235",
+            "sql": "CREATE TABLE \"locations\" (\n  \"name\" TEXT NOT NULL,\n  \"city\" TEXT NOT NULL,\n  \"country\" TEXT NOT NULL,\n  \"latitude\" REAL NOT NULL,\n  \"longitude\" REAL NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T15:18:42+00:00",
+            "table": "locations",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_969df6a6cf58",
+            "sql": "CREATE TABLE \"searchs\" (\n  \"user_id\" CHAR(36) NOT NULL,\n  \"location_id\" CHAR(36) NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"user_id\") REFERENCES \"users\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE,\n  FOREIGN KEY (\"location_id\") REFERENCES \"locations\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T15:18:42+00:00",
+            "table": "searchs",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_cf644e06ce08",
+            "sql": "ALTER TABLE \"hotels\" ADD COLUMN \"location_id\" CHAR(36) NOT NULL",
+            "destructive": false,
+            "generated_at": "2025-09-28T15:18:42+00:00",
+            "table": "hotels",
+            "operation": "add_column",
+            "warning": null
+        },
+        {
+            "id": "mig_8de8262d3f3c",
+            "sql": "ALTER TABLE \"hotels\" DROP COLUMN \"address\"",
+            "destructive": true,
+            "generated_at": "2025-09-28T15:18:42+00:00",
+            "table": "hotels",
+            "operation": "drop_column",
+            "warning": "Dropping column - data will be lost"
+        },
+        {
+            "id": "mig_dcf065bfde64",
+            "sql": "ALTER TABLE \"hotels\" DROP COLUMN \"latitude\"",
+            "destructive": true,
+            "generated_at": "2025-09-28T15:18:42+00:00",
+            "table": "hotels",
+            "operation": "drop_column",
+            "warning": "Dropping column - data will be lost"
+        },
+        {
+            "id": "mig_7f13b9fe174f",
+            "sql": "ALTER TABLE \"hotels\" DROP COLUMN \"longitude\"",
+            "destructive": true,
+            "generated_at": "2025-09-28T15:18:42+00:00",
+            "table": "hotels",
+            "operation": "drop_column",
+            "warning": "Dropping column - data will be lost"
         }
     ]
 }
