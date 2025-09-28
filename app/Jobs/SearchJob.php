@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Search;
 use Override;
 use Throwable;
 use BaseApi\Queue\Job;
@@ -13,9 +14,8 @@ class SearchJob extends Job
     protected int $retryDelay = 30; // seconds
 
     public function __construct(
-        // Add your job parameters here
-    )
-    {
+        public Search $search,
+    ) {
         // Initialize job data
     }
 
@@ -44,4 +44,3 @@ class SearchJob extends Job
         // - Clean up resources
     }
 }
-

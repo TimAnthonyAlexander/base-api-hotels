@@ -8,6 +8,7 @@ use App\Controllers\MeController;
 use App\Controllers\SignupController;
 use App\Controllers\OpenApiController;
 use App\Controllers\ApiTokenController;
+use App\Controllers\SearchController;
 use BaseApi\Http\Middleware\RateLimitMiddleware;
 use App\Middleware\CombinedAuthMiddleware;
 
@@ -70,6 +71,17 @@ $router->post('/api-tokens', [
 $router->delete('/api-tokens/{id}', [
     CombinedAuthMiddleware::class,
     ApiTokenController::class,
+]);
+
+$router->get('/search/{search_id}', [
+    CombinedAuthMiddleware::class,
+    SearchController::class,
+]);
+
+$router->post('/search', [
+    CombinedAuthMiddleware::class,
+    RateLimitMiddleware::class => ['limit' => '30/1h'],
+    SearchController::class,
 ]);
 
 if (App::config('app.env') === 'local') {
