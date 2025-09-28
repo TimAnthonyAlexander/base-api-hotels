@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "22c9a267179e9da4a1e822996fedc33a",
+    "content-hash": "b62fd90fbd844d6053bc108828e42747",
     "packages": [
         {
             "name": "baseapi/baseapi",
-            "version": "v0.7.6",
+            "version": "v0.7.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TimAnthonyAlexander/base-api.git",
-                "reference": "03d62a0e8560c4d9994ac08371464820851d3541"
+                "reference": "4fa080b4dff753f2dd56a86fe202a00c72076b78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TimAnthonyAlexander/base-api/zipball/03d62a0e8560c4d9994ac08371464820851d3541",
-                "reference": "03d62a0e8560c4d9994ac08371464820851d3541",
+                "url": "https://api.github.com/repos/TimAnthonyAlexander/base-api/zipball/4fa080b4dff753f2dd56a86fe202a00c72076b78",
+                "reference": "4fa080b4dff753f2dd56a86fe202a00c72076b78",
                 "shasum": ""
             },
             "require": {
@@ -67,9 +67,9 @@
             ],
             "support": {
                 "issues": "https://github.com/TimAnthonyAlexander/base-api/issues",
-                "source": "https://github.com/TimAnthonyAlexander/base-api/tree/v0.7.6"
+                "source": "https://github.com/TimAnthonyAlexander/base-api/tree/v0.7.7"
             },
-            "time": "2025-09-28T20:12:49+00:00"
+            "time": "2025-09-28T20:29:37+00:00"
         },
         {
             "name": "fakerphp/faker",

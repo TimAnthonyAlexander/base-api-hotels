@@ -6,6 +6,7 @@ use App\Jobs\SearchJob;
 use App\Models\Location;
 use App\Models\Search;
 use App\Models\User;
+use BaseApi\Cache\Cache;
 use BaseApi\Controllers\Controller;
 use BaseApi\Http\JsonResponse;
 
@@ -30,6 +31,7 @@ class SearchController extends Controller
 
         return JsonResponse::ok([
             'search' => $search,
+            'hotels' => Cache::has($search->generateDeterministicHash()) ? Cache::get($search->generateDeterministicHash())['hotels'] : [],
         ]);
     }
 
