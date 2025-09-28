@@ -162,6 +162,15 @@
             "table": "search",
             "operation": "add_index",
             "warning": null
+        },
+        {
+            "id": "mig_06d42d1443a7",
+            "sql": "ALTER TABLE \"search\" ADD COLUMN \"status\" TEXT NOT NULL DEFAULT 'pending'",
+            "destructive": false,
+            "generated_at": "2025-09-28T19:38:21+00:00",
+            "table": "search",
+            "operation": "add_column",
+            "warning": null
         }
     ]
 }

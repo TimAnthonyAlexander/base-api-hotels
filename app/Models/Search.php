@@ -9,6 +9,8 @@ use BaseApi\Models\BaseModel;
  */
 class Search extends BaseModel
 {
+    public string $status = 'pending';
+
     // Relationship properties - FKs will be dynamic properties from DB
     public ?User $user = null;
 
