@@ -29,9 +29,13 @@ class SearchController extends Controller
             return JsonResponse::error('Search not found', 404);
         }
 
+        $hasCache = Cache::has($search->generateDeterministicHash());
+
+        $cachedSearch = $hasCache ? Cache::get($search->generateDeterministicHash()) : null;
+
         return JsonResponse::ok([
-            'search' => $search,
-            'hotels' => Cache::has($search->generateDeterministicHash()) ? Cache::get($search->generateDeterministicHash())['hotels'] : [],
+            'search' => $cachedSearch['search'] ?? $search,
+            'hotels' => $cachedSearch['hotels'] ?? [],
         ]);
     }
 
@@ -54,8 +58,19 @@ class SearchController extends Controller
         }
 
         $search = new Search();
-        $search->user = $user;
-        $search->location = $location;
+        $search->user_id = $user->id;
+        $search->location_id = $location->id;
+
+        $hash = $search->generateDeterministicHash();
+
+        if (Cache::has($hash)) {
+            $cached = Cache::get($hash);
+
+            return JsonResponse::ok([
+                'search_id' => $cached['search']->id,
+            ]);
+        }
+
         $search->save();
 
         dispatch(new SearchJob($search));

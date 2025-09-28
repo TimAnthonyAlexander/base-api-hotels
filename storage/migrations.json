@@ -189,6 +189,15 @@
             "table": "offer",
             "operation": "drop_column",
             "warning": "Dropping column - data will be lost"
+        },
+        {
+            "id": "mig_86235f7535bf",
+            "sql": "ALTER TABLE \"search\" ADD COLUMN \"results\" INTEGER NOT NULL DEFAULT '0'",
+            "destructive": false,
+            "generated_at": "2025-09-28T21:17:12+00:00",
+            "table": "search",
+            "operation": "add_column",
+            "warning": null
         }
     ]
 }

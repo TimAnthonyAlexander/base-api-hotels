@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use Exception;
 use App\Models\Hotel;
 use App\Models\Search;
-use BaseApi\App;
 use BaseApi\Cache\Cache;
 use Override;
 use Throwable;
@@ -28,14 +28,14 @@ class SearchJob extends Job
 
         if ($exists) {
             $this->search->delete();
-            $this->search = Cache::get($hash)['search'] ?? throw new \Exception('Search not found in cache');
+            $this->search = Cache::get($hash)['search'] ?? throw new Exception('Search not found in cache');
             return;
         }
 
         $this->search->status = 'started';
         $this->search->save();
 
-        $hotels = Hotel::where('location_id', '=', $this->search->location->id)->get();
+        $hotels = Hotel::where('location_id', '=', $this->search->location_id)->get();
 
         if ($hotels === []) {
             $this->search->status = 'no_results';
@@ -46,9 +46,10 @@ class SearchJob extends Job
         }
 
         $this->search->status = 'completed';
+        $this->search->results = count($hotels);
         $this->search->save();
 
-        Cache::put($hash, $hotels, 3600); // Cache for 1 hour
+        Cache::put($hash, ['search' => $this->search, 'hotels' => $hotels], 3600); // Cache for 1 hour
     }
 
     #[Override]
