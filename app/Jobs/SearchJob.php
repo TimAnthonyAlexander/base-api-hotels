@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Exception;
 use App\Models\Hotel;
+use App\Models\Room;
 use App\Models\Search;
 use BaseApi\Cache\Cache;
 use Override;
@@ -41,15 +42,49 @@ class SearchJob extends Job
             $this->search->status = 'no_results';
             $this->search->save();
 
-            Cache::put($hash, ['search' => $this->search, 'hotels' => $hotels], 3600); // Cache for 1 hour
+            Cache::put($hash, ['search' => $this->search, 'hotels' => []], 3600); // Cache for 1 hour
             return;
         }
 
+        $hotelData = [];
+
+        foreach ($hotels as $hotel) {
+            assert($hotel instanceof Hotel);
+
+            $hotelArray = $hotel->toArray();
+            $rooms = $hotel->rooms()->get();
+
+            $roomData = [];
+
+            foreach ($rooms as $room) {
+                assert($room instanceof Room);
+
+                $roomArray = $room->toArray();
+
+                $offers = $room->offers()->get();
+
+                $roomArray['offers'] = $offers;
+
+                $roomData[] = $roomArray;
+            }
+
+            $hotelArray['rooms'] = $roomData;
+
+            $hotelData[] = $hotelArray;
+        }
+
         $this->search->status = 'completed';
-        $this->search->results = count($hotels);
+        $this->search->results = count($hotelData);
         $this->search->save();
 
-        Cache::put($hash, ['search' => $this->search, 'hotels' => $hotels], 3600); // Cache for 1 hour
+        Cache::put(
+            $hash,
+            [
+                'search' => $this->search,
+                'hotels' => $hotelData,
+            ],
+            3600, // Cache for 1 hour
+        );
     }
 
     #[Override]
