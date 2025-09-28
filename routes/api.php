@@ -6,8 +6,6 @@ use App\Controllers\LoginController;
 use App\Controllers\LogoutController;
 use App\Controllers\MeController;
 use App\Controllers\SignupController;
-use App\Controllers\FileUploadController;
-use App\Controllers\BenchmarkController;
 use App\Controllers\OpenApiController;
 use App\Controllers\ApiTokenController;
 use BaseApi\Http\Middleware\RateLimitMiddleware;
