@@ -63,6 +63,60 @@
             "table": "hotels",
             "operation": "create_table",
             "warning": null
+        },
+        {
+            "id": "mig_732c3dc17138",
+            "sql": "CREATE TABLE \"offers\" (\n  \"room_id\" CHAR(36) NOT NULL,\n  \"price\" REAL NOT NULL,\n  \"discounts\" TEXT NOT NULL,\n  \"effective_price\" REAL NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"room_id\") REFERENCES \"rooms\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T14:58:01+00:00",
+            "table": "offers",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_9520a11e5320",
+            "sql": "CREATE TABLE \"rooms\" (\n  \"hotel_id\" CHAR(36) NOT NULL,\n  \"category\" TEXT NOT NULL,\n  \"description\" TEXT NOT NULL,\n  \"capacity\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (\"hotel_id\") REFERENCES \"hotels\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T14:58:01+00:00",
+            "table": "rooms",
+            "operation": "create_table",
+            "warning": null
+        },
+        {
+            "id": "mig_819808e3e4b0",
+            "sql": "CREATE INDEX \"idx_offers_room_id\" ON \"offers\" (\"room_id\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T14:58:01+00:00",
+            "table": "offers",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_f9663197c6da",
+            "sql": "CREATE INDEX \"idx_offers_price\" ON \"offers\" (\"price\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T14:58:01+00:00",
+            "table": "offers",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_8496b67f26bc",
+            "sql": "CREATE INDEX \"idx_rooms_hotel_id\" ON \"rooms\" (\"hotel_id\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T14:58:01+00:00",
+            "table": "rooms",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_9198a7cd8d0f",
+            "sql": "CREATE INDEX \"idx_rooms_category\" ON \"rooms\" (\"category\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T14:58:01+00:00",
+            "table": "rooms",
+            "operation": "add_index",
+            "warning": null
         }
     ]
 }
