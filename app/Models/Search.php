@@ -15,6 +15,7 @@ class Search extends BaseModel
     // public ?string $email = null;
     // public bool $active = true;
     public User $user;
+
     public Location $location;
 
     // Optional: Define custom table name

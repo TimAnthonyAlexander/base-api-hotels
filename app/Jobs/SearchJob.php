@@ -2,11 +2,14 @@
 
 namespace App\Jobs;
 
+use Override;
+use Throwable;
 use BaseApi\Queue\Job;
 
 class SearchJob extends Job
 {
     protected int $maxRetries = 1;
+
     protected int $retryDelay = 30; // seconds
 
     public function __construct(
@@ -16,6 +19,7 @@ class SearchJob extends Job
         // Initialize job data
     }
 
+    #[Override]
     public function handle(): void
     {
         // Implement your job logic here
@@ -26,12 +30,13 @@ class SearchJob extends Job
         // $this->sendNotification();
     }
 
-    public function failed(\Throwable $exception): void
+    #[Override]
+    public function failed(Throwable $throwable): void
     {
         // Handle job failure (optional)
         // This method is called when the job fails permanently
 
-        parent::failed($exception);
+        parent::failed($throwable);
 
         // Add custom failure handling:
         // - Send notification to administrators

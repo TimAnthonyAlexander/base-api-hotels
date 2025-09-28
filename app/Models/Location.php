@@ -17,9 +17,11 @@ class Location extends BaseModel
     public string $name;
 
     public string $city;
+
     public string $country;
 
     public float $latitude;
+
     public float $longitude;
 
     // Optional: Define custom table name
