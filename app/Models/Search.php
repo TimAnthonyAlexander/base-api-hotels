@@ -9,14 +9,10 @@ use BaseApi\Models\BaseModel;
  */
 class Search extends BaseModel
 {
-    // Add your model properties here
-    // Example:
-    // public string $name = '';
-    // public ?string $email = null;
-    // public bool $active = true;
-    public User $user;
+    // Relationship properties - FKs will be dynamic properties from DB
+    public ?User $user = null;
 
-    public Location $location;
+    public ?Location $location = null;
 
     // Optional: Define custom table name
     // protected static ?string $table = 'Search_table';
@@ -27,6 +23,11 @@ class Search extends BaseModel
     //     'created_at' => 'index',    // Creates regular index
     //     'status' => 'index'
     // ];
+    public static array $indexes = [
+        'user_id' => 'index',
+        'location_id' => 'index',
+        'created_at' => 'index'
+    ];
 
     // Optional: Define column overrides (used by migrations)
     // public static array $columns = [
@@ -64,4 +65,3 @@ class Search extends BaseModel
     // Eager loading:
     // $modelsWithRelations = Search::with(['user', 'posts'])->get();
 }
-

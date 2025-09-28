@@ -135,6 +135,33 @@
             "table": "jobs",
             "operation": "create_table",
             "description": "Create jobs table and indexes for queue system"
+        },
+        {
+            "id": "mig_e2124c5d5034",
+            "sql": "CREATE INDEX \"idx_search_user_id\" ON \"search\" (\"user_id\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T19:30:46+00:00",
+            "table": "search",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_09ff2df02880",
+            "sql": "CREATE INDEX \"idx_search_location_id\" ON \"search\" (\"location_id\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T19:30:46+00:00",
+            "table": "search",
+            "operation": "add_index",
+            "warning": null
+        },
+        {
+            "id": "mig_11ba66193523",
+            "sql": "CREATE INDEX \"idx_search_created_at\" ON \"search\" (\"created_at\")",
+            "destructive": false,
+            "generated_at": "2025-09-28T19:30:46+00:00",
+            "table": "search",
+            "operation": "add_index",
+            "warning": null
         }
     ]
 }
