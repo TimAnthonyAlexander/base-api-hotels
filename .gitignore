@@ -1,0 +1,7 @@
+vendor
+.env
+storage/executed-migrations.json
+
+# Rector cache
+var/cache/rector
+.phpunit.cache
