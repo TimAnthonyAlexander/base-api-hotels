@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Models\Hotel;
 use App\Models\Search;
+use BaseApi\App;
+use BaseApi\Cache\Cache;
 use Override;
 use Throwable;
 use BaseApi\Queue\Job;
@@ -16,13 +18,20 @@ class SearchJob extends Job
 
     public function __construct(
         public Search $search,
-    ) {
-        // Initialize job data
-    }
+    ) {}
 
     #[Override]
     public function handle(): void
     {
+        $hash = $this->search->generateDeterministicHash();
+        $exists = Cache::has($hash);
+
+        if ($exists) {
+            $this->search->delete();
+            $this->search = Cache::get($hash)['search'] ?? throw new \Exception('Search not found in cache');
+            return;
+        }
+
         $this->search->status = 'started';
         $this->search->save();
 
@@ -31,22 +40,22 @@ class SearchJob extends Job
         if ($hotels === []) {
             $this->search->status = 'no_results';
             $this->search->save();
+
+            Cache::put($hash, ['search' => $this->search, 'hotels' => $hotels], 3600); // Cache for 1 hour
             return;
         }
+
+        $this->search->status = 'completed';
+        $this->search->save();
+
+        Cache::put($hash, $hotels, 3600); // Cache for 1 hour
     }
 
     #[Override]
     public function failed(Throwable $throwable): void
     {
-        // Handle job failure (optional)
-        // This method is called when the job fails permanently
         $this->search->status = 'failed';
 
         parent::failed($throwable);
-
-        // Add custom failure handling:
-        // - Send notification to administrators
-        // - Log to external service
-        // - Clean up resources
     }
 }
