@@ -25,9 +25,6 @@ $router->get('/health', [
     HealthController::class,
 ]);
 
-// Benchmark endpoint (no middleware for performance testing)
-$router->get('/benchmark', [BenchmarkController::class]);
-
 // ================================  
 // Authentication Endpoints
 // ================================
@@ -77,35 +74,7 @@ $router->delete('/api-tokens/{id}', [
     ApiTokenController::class,
 ]);
 
-// ================================
-// File Upload Examples
-// ================================
-
-// Basic file upload
-$router->post('/files/upload', [
-    CombinedAuthMiddleware::class,
-    RateLimitMiddleware::class => ['limit' => '10/1m'],
-    FileUploadController::class,
-]);
-
-// Get file info
-$router->get('/files/info', [
-    CombinedAuthMiddleware::class,
-    FileUploadController::class,
-]);
-
-// Delete files
-$router->delete('/files', [
-    CombinedAuthMiddleware::class,
-    FileUploadController::class,
-]);
-
-// ================================
-// Development Only
-// ================================
-
 if (App::config('app.env') === 'local') {
     // OpenAPI schema for API documentation
     $router->get('/openapi.json', [OpenApiController::class]);
 }
-

@@ -54,6 +54,15 @@
             "table": "jobs",
             "operation": "create_table",
             "description": "Create jobs table and indexes for queue system"
+        },
+        {
+            "id": "mig_18681b668f9c",
+            "sql": "CREATE TABLE \"hotels\" (\n  \"title\" TEXT NOT NULL,\n  \"description\" TEXT NOT NULL,\n  \"address\" TEXT NOT NULL,\n  \"latitude\" REAL NOT NULL,\n  \"longitude\" REAL NOT NULL,\n  \"star_rating\" INTEGER NOT NULL,\n  \"id\" TEXT PRIMARY KEY NOT NULL,\n  \"created_at\" DATETIME DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" DATETIME DEFAULT CURRENT_TIMESTAMP\n)",
+            "destructive": false,
+            "generated_at": "2025-09-28T14:46:42+00:00",
+            "table": "hotels",
+            "operation": "create_table",
+            "warning": null
         }
     ]
 }
