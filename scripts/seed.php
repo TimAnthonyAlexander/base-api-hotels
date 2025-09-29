@@ -248,9 +248,20 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
                 $price = round($price + random_int(-15, 25), 2);
             }
 
-            // Generate realistic date ranges
-            $startDate = $faker->dateTimeBetween('now', '+6 months');
-            $endDate = $faker->dateTimeBetween($startDate, $startDate->format('Y-m-d') . ' +3 months');
+            // Generate realistic date ranges with better immediate availability
+            if ($o === 0 && random_int(1, 3) === 1) {
+                // 33% chance first offer starts in the past and is still active (overlaps today)
+                $startDate = $faker->dateTimeBetween('-2 months', 'now');
+                $endDate = $faker->dateTimeBetween('tomorrow', '+1 month');
+            } elseif (random_int(1, 4) === 1) {
+                // 25% chance offer starts today or very soon (next few days)
+                $startDate = $faker->dateTimeBetween('now', '+3 days');
+                $endDate = $faker->dateTimeBetween($startDate, $startDate->format('Y-m-d') . ' +2 months');
+            } else {
+                // Rest start in the future
+                $startDate = $faker->dateTimeBetween('+1 week', '+6 months');
+                $endDate = $faker->dateTimeBetween($startDate, $startDate->format('Y-m-d') . ' +3 months');
+            }
 
             $offer = new Offer();
             $offer->room_id = $room->id;
