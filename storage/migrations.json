@@ -198,6 +198,60 @@
             "table": "search",
             "operation": "add_column",
             "warning": null
+        },
+        {
+            "id": "mig_b2d7035684e9",
+            "sql": "ALTER TABLE \"offer\" ADD COLUMN \"availability\" INTEGER NOT NULL DEFAULT '1'",
+            "destructive": false,
+            "generated_at": "2025-09-28T23:09:35+00:00",
+            "table": "offer",
+            "operation": "add_column",
+            "warning": null
+        },
+        {
+            "id": "mig_f308fd93a223",
+            "sql": "ALTER TABLE \"offer\" ADD COLUMN \"starts_on\" TEXT NOT NULL DEFAULT ''",
+            "destructive": false,
+            "generated_at": "2025-09-28T23:09:35+00:00",
+            "table": "offer",
+            "operation": "add_column",
+            "warning": "Auto-generated default value '' for NOT NULL column without explicit default"
+        },
+        {
+            "id": "mig_a5f73a85cc74",
+            "sql": "ALTER TABLE \"offer\" ADD COLUMN \"ends_on\" TEXT NOT NULL DEFAULT ''",
+            "destructive": false,
+            "generated_at": "2025-09-28T23:09:35+00:00",
+            "table": "offer",
+            "operation": "add_column",
+            "warning": "Auto-generated default value '' for NOT NULL column without explicit default"
+        },
+        {
+            "id": "mig_9133b7407ebb",
+            "sql": "ALTER TABLE \"search\" ADD COLUMN \"starts_on\" TEXT NOT NULL DEFAULT ''",
+            "destructive": false,
+            "generated_at": "2025-09-28T23:09:35+00:00",
+            "table": "search",
+            "operation": "add_column",
+            "warning": "Auto-generated default value '' for NOT NULL column without explicit default"
+        },
+        {
+            "id": "mig_a61fc11f43ca",
+            "sql": "ALTER TABLE \"search\" ADD COLUMN \"ends_on\" TEXT NOT NULL DEFAULT ''",
+            "destructive": false,
+            "generated_at": "2025-09-28T23:09:35+00:00",
+            "table": "search",
+            "operation": "add_column",
+            "warning": "Auto-generated default value '' for NOT NULL column without explicit default"
+        },
+        {
+            "id": "mig_76b927c5a64a",
+            "sql": "ALTER TABLE \"search\" ADD COLUMN \"capacity\" INTEGER NOT NULL DEFAULT '0'",
+            "destructive": false,
+            "generated_at": "2025-09-28T23:09:35+00:00",
+            "table": "search",
+            "operation": "add_column",
+            "warning": "Auto-generated default value '0' for NOT NULL column without explicit default"
         }
     ]
 }

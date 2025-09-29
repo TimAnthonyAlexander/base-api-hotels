@@ -248,11 +248,18 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
                 $price = round($price + random_int(-15, 25), 2);
             }
 
+            // Generate realistic date ranges
+            $startDate = $faker->dateTimeBetween('now', '+6 months');
+            $endDate = $faker->dateTimeBetween($startDate, $startDate->format('Y-m-d') . ' +3 months');
+
             $offer = new Offer();
             $offer->room = $room;
             $offer->price = (float)$price;
             $offer->discount = max(0.0, round($price * (random_int(0, 20) / 100.0), 2));
             $offer->effective_price = round($offer->price - $offer->discount, 2);
+            $offer->availability = random_int(1, 10) > 2; // 80% availability rate
+            $offer->starts_on = $startDate->format('Y-m-d');
+            $offer->ends_on = $endDate->format('Y-m-d');
             $offer->save();
             $offersCreated++;
         }

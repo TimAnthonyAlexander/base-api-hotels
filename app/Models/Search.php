@@ -18,6 +18,12 @@ class Search extends BaseModel
 
     public int $results = 0;
 
+    public string $starts_on;
+
+    public string $ends_on;
+
+    public int $capacity;
+
     public static array $indexes = [
         'user_id' => 'index',
         'location_id' => 'index',
@@ -36,7 +42,7 @@ class Search extends BaseModel
 
     public function generateDeterministicHash(): string
     {
-        $data = $this->user_id . '|' . $this->location_id;
+        $data = $this->user_id . '|' . $this->location_id . '|' . $this->starts_on . '|' . $this->ends_on . '|' . $this->capacity;
         return hash('sha256', $data);
     }
 }

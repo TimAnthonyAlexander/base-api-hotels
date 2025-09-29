@@ -38,7 +38,7 @@
     },
     "scripts": {
         "serve": "php mason serve",
-        "serve-screen": "screen -dmS baseapi php mason serve",
+        "serve-screen": "screen -dmS hotels php mason serve",
         "phpstan": "phpstan analyse --memory-limit=256M",
         "post-create-project-cmd": [
             "@php -r \"copy('.env.example', '.env');\"",

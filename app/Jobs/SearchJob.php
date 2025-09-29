@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Exception;
 use App\Models\Hotel;
+use App\Models\Offer;
 use App\Models\Room;
 use App\Models\Search;
 use BaseApi\Cache\Cache;
@@ -79,11 +80,30 @@ class SearchJob extends Job
             foreach ($rooms as $room) {
                 assert($room instanceof Room);
 
+                // Filter out rooms that don't meet capacity requirements
+                if ($room->capacity < $this->search->capacity) {
+                    continue;
+                }
+
                 $roomArray = $room->toArray();
                 $offers = $room->offers()->get();
-                $roomArray['offers'] = $this->sortOffersByPrice($offers);
+
+                // Filter offers by availability and date overlap
+                $filteredOffers = $this->filterOffers($offers);
+
+                // Skip room if no valid offers
+                if (empty($filteredOffers)) {
+                    continue;
+                }
+
+                $roomArray['offers'] = $this->sortOffersByPrice($filteredOffers);
 
                 $roomData[] = $roomArray;
+            }
+
+            // Skip hotel if no valid rooms
+            if (empty($roomData)) {
+                continue;
             }
 
             // Sort rooms by their cheapest offer
@@ -94,6 +114,47 @@ class SearchJob extends Job
         }
 
         return $hotelData;
+    }
+
+    /**
+     * Filter offers by availability and date overlap
+     */
+    protected function filterOffers(array $offers): array
+    {
+        $filteredOffers = [];
+
+        foreach ($offers as $offer) {
+            assert($offer instanceof Offer);
+
+            // Check availability
+            if (!$offer->availability) {
+                continue;
+            }
+
+            // Check date overlap
+            if (!$this->datesOverlap($offer->starts_on, $offer->ends_on, $this->search->starts_on, $this->search->ends_on)) {
+                continue;
+            }
+
+            $filteredOffers[] = $offer;
+        }
+
+        return $filteredOffers;
+    }
+
+    /**
+     * Check if two date ranges overlap
+     */
+    protected function datesOverlap(string $offer_start, string $offer_end, string $search_start, string $search_end): bool
+    {
+        // Convert to timestamps for comparison
+        $offer_start_ts = strtotime($offer_start);
+        $offer_end_ts = strtotime($offer_end);
+        $search_start_ts = strtotime($search_start);
+        $search_end_ts = strtotime($search_end);
+
+        // Check if ranges overlap: offer_start <= search_end && search_start <= offer_end
+        return $offer_start_ts <= $search_end_ts && $search_start_ts <= $offer_end_ts;
     }
 
     /**

@@ -21,6 +21,12 @@ class SearchController extends Controller
 
     public string $location_id = '';
 
+    public string $starts_on = '';
+
+    public string $ends_on = '';
+
+    public int $capacity = 1;
+
     public function get(): JsonResponse
     {
         $search = Search::find($this->search_id);
@@ -43,6 +49,9 @@ class SearchController extends Controller
     {
         $this->validate([
             'location_id' => 'required',
+            'starts_on' => 'required|string',
+            'ends_on' => 'required|string',
+            'capacity' => 'required|integer|min:1',
         ]);
 
         $location = Location::find($this->location_id);
@@ -60,6 +69,9 @@ class SearchController extends Controller
         $search = new Search();
         $search->user_id = $user->id;
         $search->location_id = $location->id;
+        $search->starts_on = $this->starts_on;
+        $search->ends_on = $this->ends_on;
+        $search->capacity = $this->capacity;
 
         $hash = $search->generateDeterministicHash();
 
