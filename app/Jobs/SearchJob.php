@@ -92,7 +92,7 @@ class SearchJob extends Job
                 $filteredOffers = $this->filterOffers($offers);
 
                 // Skip room if no valid offers
-                if (empty($filteredOffers)) {
+                if ($filteredOffers === []) {
                     continue;
                 }
 
@@ -102,7 +102,7 @@ class SearchJob extends Job
             }
 
             // Skip hotel if no valid rooms
-            if (empty($roomData)) {
+            if ($roomData === []) {
                 continue;
             }
 
