@@ -223,7 +223,7 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
     $hotel = new Hotel();
     $hotel->title = $mkTitle($city);
     $hotel->description = $mkDesc($city);
-    $hotel->location = $location;
+    $hotel->location_id = $location->id;
     $hotel->star_rating = random_int(2, 5);
     $hotel->save();
     $hotelsCreated++;
@@ -234,7 +234,7 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
         $capacity = random_int(1, 6);
 
         $room = new Room();
-        $room->hotel = $hotel;
+        $room->hotel_id = $hotel->id;
         $room->category = $category;
         $room->description = $faker->sentence(10);
         $room->capacity = $capacity;
@@ -253,7 +253,7 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
             $endDate = $faker->dateTimeBetween($startDate, $startDate->format('Y-m-d') . ' +3 months');
 
             $offer = new Offer();
-            $offer->room = $room;
+            $offer->room_id = $room->id;
             $offer->price = (float)$price;
             $offer->discount = max(0.0, round($price * (random_int(0, 20) / 100.0), 2));
             $offer->effective_price = round($offer->price - $offer->discount, 2);

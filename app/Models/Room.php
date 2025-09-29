@@ -16,9 +16,8 @@ class Room extends BaseModel
     // public string $name = '';
     // public ?string $email = null;
     // public bool $active = true;
-    public Hotel $hotel;
+    public string $hotel_id;
 
-     // Relation to Hotel
     public string $category;
 
     public string $description;

@@ -15,7 +15,7 @@ class Offer extends BaseModel
     // public string $name = '';
     // public ?string $email = null;
     // public bool $active = true;
-    public Room $room; // Relation to Room
+    public string $room_id;
 
     public float $price;
 
