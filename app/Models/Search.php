@@ -18,11 +18,11 @@ class Search extends BaseModel
 
     public int $results = 0;
 
-    public string $starts_on;
+    public string $starts_on = '';
 
-    public string $ends_on;
+    public string $ends_on = '';
 
-    public int $capacity;
+    public int $capacity = 1;
 
     public static array $indexes = [
         'user_id' => 'index',

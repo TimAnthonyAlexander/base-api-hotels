@@ -25,9 +25,9 @@ class Offer extends BaseModel
 
     public bool $availability = true;
 
-    public string $starts_on;
+    public string $starts_on = '';
 
-    public string $ends_on;
+    public string $ends_on = '';
 
     // Optional: Define custom table name
     // protected static ?string $table = 'Offer_table';

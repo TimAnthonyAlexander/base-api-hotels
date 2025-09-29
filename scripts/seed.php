@@ -237,7 +237,7 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
         $room->hotel_id = $hotel->id;
         $room->category = $category;
         $room->description = $faker->sentence(10);
-        $room->capacity = $capacity;
+        $room->capacity = $capacity; // Already set above to random_int(1, 6)
         $room->save();
         $roomsCreated++;
 
@@ -248,19 +248,23 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
                 $price = round($price + random_int(-15, 25), 2);
             }
 
-            // Generate realistic date ranges with better immediate availability
+            // Generate realistic date ranges with proper constraints (ensuring ends_on > starts_on)
             if ($o === 0 && random_int(1, 3) === 1) {
                 // 33% chance first offer starts in the past and is still active (overlaps today)
                 $startDate = $faker->dateTimeBetween('-2 months', 'now');
-                $endDate = $faker->dateTimeBetween('tomorrow', '+1 month');
+                $endDate = (clone $startDate)->modify('+' . random_int(7, 60) . ' days');
+                // Ensure it extends beyond today
+                if ($endDate <= new DateTime('now')) {
+                    $endDate = (new DateTime('now'))->modify('+' . random_int(1, 30) . ' days');
+                }
             } elseif (random_int(1, 4) === 1) {
                 // 25% chance offer starts today or very soon (next few days)
                 $startDate = $faker->dateTimeBetween('now', '+3 days');
-                $endDate = $faker->dateTimeBetween($startDate, $startDate->format('Y-m-d') . ' +2 months');
+                $endDate = (clone $startDate)->modify('+' . random_int(1, 60) . ' days');
             } else {
                 // Rest start in the future
                 $startDate = $faker->dateTimeBetween('+1 week', '+6 months');
-                $endDate = $faker->dateTimeBetween($startDate, $startDate->format('Y-m-d') . ' +3 months');
+                $endDate = (clone $startDate)->modify('+' . random_int(1, 90) . ' days');
             }
 
             $offer = new Offer();

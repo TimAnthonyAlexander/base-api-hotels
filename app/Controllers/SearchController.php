@@ -2,6 +2,9 @@
 
 namespace App\Controllers;
 
+use DateTimeZone;
+use DateTimeImmutable;
+use Exception;
 use App\Jobs\SearchJob;
 use App\Models\Location;
 use App\Models\Search;
@@ -48,11 +51,31 @@ class SearchController extends Controller
     public function post(): JsonResponse
     {
         $this->validate([
-            'location_id' => 'required',
-            'starts_on' => 'required|string',
-            'ends_on' => 'required|string',
-            'capacity' => 'required|integer|min:1',
+            'location_id' => 'required|string',
+            'starts_on' => 'required|date_format:Y-m-d',
+            'ends_on' => 'required|date_format:Y-m-d|after:starts_on',
+            'capacity' => 'required|integer|min:1|max:12',
         ]);
+
+        // Normalize dates to canonical UTC Y-m-d format
+        $dateTimeZone = new DateTimeZone('UTC');
+        try {
+            $starts = (new DateTimeImmutable($this->starts_on, $dateTimeZone))->format('Y-m-d');
+            $ends = (new DateTimeImmutable($this->ends_on, $dateTimeZone))->format('Y-m-d');
+            
+            // Reject same-day bookings (starts_on == ends_on)
+            if ($starts === $ends) {
+                return JsonResponse::validationError(['ends_on' => ['End date must be after start date']]);
+            }
+            
+            // Reject requests beyond reasonable horizon (2 years)
+            $maxDate = (new DateTimeImmutable('now', $dateTimeZone))->modify('+2 years')->format('Y-m-d');
+            if ($starts > $maxDate || $ends > $maxDate) {
+                return JsonResponse::validationError(['dates' => ['Booking dates cannot be more than 2 years in the future']]);
+            }
+        } catch (Exception) {
+            return JsonResponse::validationError(['dates' => ['Invalid date format']]);
+        }
 
         $location = Location::find($this->location_id);
 
@@ -69,8 +92,8 @@ class SearchController extends Controller
         $search = new Search();
         $search->user_id = $user->id;
         $search->location_id = $location->id;
-        $search->starts_on = $this->starts_on;
-        $search->ends_on = $this->ends_on;
+        $search->starts_on = $starts;
+        $search->ends_on = $ends;
         $search->capacity = $this->capacity;
 
         $hash = $search->generateDeterministicHash();

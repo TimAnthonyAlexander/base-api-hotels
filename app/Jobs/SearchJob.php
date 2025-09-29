@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use DateTimeZone;
+use DateTimeImmutable;
 use Exception;
 use App\Models\Hotel;
 use App\Models\Offer;
@@ -73,30 +75,43 @@ class SearchJob extends Job
             assert($hotel instanceof Hotel);
 
             $hotelArray = $hotel->toArray();
-            $rooms = $hotel->rooms()->get();
+            // Load all rooms and filter by capacity in PHP  
+            $allRooms = $hotel->rooms()->get();
+            $rooms = array_filter($allRooms, function($room): bool {
+                assert($room instanceof Room);
+                return $room->capacity >= $this->search->capacity;
+            });
 
             $roomData = [];
 
             foreach ($rooms as $room) {
                 assert($room instanceof Room);
 
-                // Filter out rooms that don't meet capacity requirements
-                if ($room->capacity < $this->search->capacity) {
-                    continue;
-                }
-
                 $roomArray = $room->toArray();
-                $offers = $room->offers()->get();
+                
+                // Load all offers and filter in PHP (BaseAPI doesn't support where() on relations)
+                $allOffers = $room->offers()->get();
+                $offers = array_filter($allOffers, function($offer): bool {
+                    assert($offer instanceof Offer);
+                    return $offer->availability && 
+                           $offer->starts_on <= $this->search->starts_on && 
+                           $offer->ends_on >= $this->search->ends_on;
+                });
 
-                // Filter offers by availability and date overlap
-                $filteredOffers = $this->filterOffers($offers);
-
-                // Skip room if no valid offers
-                if ($filteredOffers === []) {
+                // Skip room if no valid offers after initial filtering
+                if ($offers === []) {
                     continue;
                 }
 
-                $roomArray['offers'] = $this->sortOffersByPrice($filteredOffers);
+                // Apply additional date containment logic for proper hotel booking semantics
+                $validOffers = $this->validateOfferDates($offers);
+
+                // Skip room if no offers pass the containment check
+                if ($validOffers === []) {
+                    continue;
+                }
+
+                $roomArray['offers'] = $this->sortOffersByPrice($validOffers);
 
                 $roomData[] = $roomArray;
             }
@@ -117,44 +132,53 @@ class SearchJob extends Job
     }
 
     /**
-     * Filter offers by availability and date overlap
+     * Validate offers using complex date containment logic
+     * (Called after SQL-level filtering for performance)
      */
-    protected function filterOffers(array $offers): array
+    protected function validateOfferDates(array $offers): array
     {
-        $filteredOffers = [];
+        $validOffers = [];
 
         foreach ($offers as $offer) {
             assert($offer instanceof Offer);
 
-            // Check availability
-            if (!$offer->availability) {
+            // Check if offer covers the entire requested stay
+            if (!$this->offerCoversStay($offer->starts_on, $offer->ends_on, $this->search->starts_on, $this->search->ends_on)) {
                 continue;
             }
 
-            // Check date overlap
-            if (!$this->datesOverlap($offer->starts_on, $offer->ends_on, $this->search->starts_on, $this->search->ends_on)) {
-                continue;
-            }
-
-            $filteredOffers[] = $offer;
+            $validOffers[] = $offer;
         }
 
-        return $filteredOffers;
+        return $validOffers;
     }
 
     /**
-     * Check if two date ranges overlap
+     * Check if offer covers the entire requested stay period
+     * Uses proper hotel booking semantics with half-open intervals [start, end)
      */
-    protected function datesOverlap(string $offer_start, string $offer_end, string $search_start, string $search_end): bool
+     protected function offerCoversStay(string $offerStart, string $offerEnd, string $searchStart, string $searchEnd): bool
     {
-        // Convert to timestamps for comparison
-        $offer_start_ts = strtotime($offer_start);
-        $offer_end_ts = strtotime($offer_end);
-        $search_start_ts = strtotime($search_start);
-        $search_end_ts = strtotime($search_end);
+        $dateTimeZone = new DateTimeZone('UTC');
 
-        // Check if ranges overlap: offer_start <= search_end && search_start <= offer_end
-        return $offer_start_ts <= $search_end_ts && $search_start_ts <= $offer_end_ts;
+        try {
+            // Treat ranges as [start, end) at midnight UTC
+            $oS = (new DateTimeImmutable($offerStart, $dateTimeZone))->setTime(0, 0, 0);
+            $oE = (new DateTimeImmutable($offerEnd, $dateTimeZone))->setTime(0, 0, 0);
+            $sS = (new DateTimeImmutable($searchStart, $dateTimeZone))->setTime(0, 0, 0);
+            $sE = (new DateTimeImmutable($searchEnd, $dateTimeZone))->setTime(0, 0, 0);
+
+            // Validate ranges are not empty
+            if ($oE <= $oS || $sE <= $sS) {
+                return false;
+            }
+
+            // Offer must contain the requested stay: offer_start <= search_start && search_end <= offer_end
+            return $oS <= $sS && $sE <= $oE;
+        } catch (Exception) {
+            // If date parsing fails, reject the offer
+            return false;
+        }
     }
 
     /**
