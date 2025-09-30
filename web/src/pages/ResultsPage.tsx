@@ -12,9 +12,10 @@ import {
   Chip,
   Stack,
   Fade,
-  Skeleton,
+  Button,
+  CardMedia,
 } from '@mui/material';
-import { Hotel as HotelIcon, Star, Refresh } from '@mui/icons-material';
+import { Hotel as HotelIcon, Star, ArrowForward, CalendarToday, People } from '@mui/icons-material';
 import { apiClient, type Hotel, type SearchResult } from '../lib/api';
 import SearchForm, { type SearchFormData } from '../components/SearchForm';
 
@@ -24,7 +25,6 @@ export default function ResultsPage() {
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchFormOpen, setSearchFormOpen] = useState(false);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -41,7 +41,7 @@ export default function ResultsPage() {
     };
 
     fetchResults();
-    const interval = setInterval(fetchResults, 2000); // Poll every 2 seconds
+    const interval = setInterval(fetchResults, 2000);
 
     return () => clearInterval(interval);
   }, [searchId]);
@@ -75,24 +75,15 @@ export default function ResultsPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%)',
+          bgcolor: '#fafafa',
         }}
       >
         <Box sx={{ textAlign: 'center' }}>
           <CircularProgress 
             size={60} 
-            sx={{ 
-              color: '#667eea',
-              mb: 2,
-            }} 
+            sx={{ color: '#003580', mb: 2 }} 
           />
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: '#666',
-              fontWeight: 300,
-            }}
-          >
+          <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
             Finding the best hotels for you...
           </Typography>
         </Box>
@@ -102,15 +93,9 @@ export default function ResultsPage() {
 
   if (error) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#fafafa', py: 8 }}>
-        <Container maxWidth="md">
-          <Alert 
-            severity="error" 
-            sx={{ 
-              borderRadius: 2,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-            }}
-          >
+      <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa', py: 8 }}>
+        <Container maxWidth="lg">
+          <Alert severity="error" sx={{ borderRadius: 2 }}>
             {error}
           </Alert>
         </Container>
@@ -124,217 +109,239 @@ export default function ResultsPage() {
 
   const isSearching = searchResult.search.status === 'pending' || searchResult.search.status === 'started';
 
+  // Placeholder images for hotels (in production, these would come from the API)
+  const hotelImages = [
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800&auto=format&fit=crop',
+  ];
+
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(to bottom, #fafafa 0%, #ffffff 100%)' }}>
-      {/* Header with gradient */}
+    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb' }}>
+      {/* Top Navigation Bar */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          pt: 4,
-          pb: 8,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: -2,
-            left: 0,
-            right: 0,
-            height: '60px',
-            background: 'linear-gradient(to bottom, transparent, #fafafa)',
-          },
+          bgcolor: 'white',
+          borderBottom: '1px solid #e0e0e0',
+          py: 2,
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{
-                fontWeight: 600,
-                letterSpacing: '-0.02em',
-                color: 'white',
-                mb: 1,
-                fontSize: { xs: '2rem', md: '2.5rem' },
-              }}
-            >
-              Your Search Results
-            </Typography>
-            <Typography 
-              variant="body1" 
-              sx={{ 
-                color: 'rgba(255, 255, 255, 0.9)', 
-                fontWeight: 300,
-                fontSize: '1.1rem',
-              }}
-            >
-              {searchResult.search.results} {searchResult.search.results === 1 ? 'hotel' : 'hotels'} found
-              {isSearching && (
-                <Chip
-                  icon={<Refresh sx={{ animation: 'spin 1s linear infinite', '@keyframes spin': { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } } }} />}
-                  label="Searching"
-                  size="small"
-                  sx={{
-                    ml: 2,
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    fontWeight: 500,
-                  }}
-                />
-              )}
-            </Typography>
-          </Box>
-
-          {/* Compact Search Form */}
-          <SearchForm 
-            onSubmit={handleNewSearch} 
-            compact 
-          />
+        <Container maxWidth="lg">
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              color: '#003580',
+              cursor: 'pointer',
+            }}
+            onClick={() => navigate('/')}
+          >
+            Hotel Comparison
+          </Typography>
         </Container>
       </Box>
 
-      {/* Results Container */}
-      <Container maxWidth="lg" sx={{ mt: -2, pb: 8 }}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Compact Search Form */}
+        <Box sx={{ mb: 3 }}>
+          <SearchForm onSubmit={handleNewSearch} compact />
+        </Box>
+
+        {/* Context Header */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              color: '#1a1a1a',
+              mb: 0.5,
+              fontSize: { xs: '1.5rem', md: '2rem' },
+            }}
+          >
+            Hotels Found
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
+              {searchResult.search.results} {searchResult.search.results === 1 ? 'result' : 'results'}
+            </Typography>
+            {isSearching && (
+              <Chip
+                label="Searching..."
+                size="small"
+                sx={{
+                  bgcolor: '#e3f2fd',
+                  color: '#003580',
+                  fontWeight: 500,
+                }}
+              />
+            )}
+          </Box>
+        </Box>
+
+        {/* Results */}
         {searchResult.hotels.length === 0 ? (
-          <Fade in timeout={600}>
-            <Alert 
-              severity="info" 
-              sx={{ 
-                borderRadius: 3,
-                border: '1px solid #e3f2fd',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-              }}
-            >
-              {isSearching
-                ? 'Searching for available hotels...'
-                : 'No hotels found for your search criteria'}
-            </Alert>
-          </Fade>
+          <Alert 
+            severity="info" 
+            sx={{ 
+              borderRadius: 2,
+              bgcolor: 'white',
+            }}
+          >
+            {isSearching
+              ? 'Searching for available hotels...'
+              : 'No hotels found for your search criteria'}
+          </Alert>
         ) : (
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             {searchResult.hotels.map((hotel, index) => {
               const bestPrice = getBestPrice(hotel);
               const roomCount = hotel.rooms.length;
+              const imageUrl = hotelImages[index % hotelImages.length];
 
               return (
-                <Fade in timeout={400 + (index * 100)} key={hotel.id}>
+                <Fade in timeout={300 + (index * 50)} key={hotel.id}>
                   <Card
                     elevation={0}
                     sx={{
-                      borderRadius: 3,
+                      borderRadius: 2,
                       border: '1px solid #e0e0e0',
-                      background: 'white',
+                      bgcolor: 'white',
                       overflow: 'hidden',
-                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                      position: 'relative',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: '4px',
-                        background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                        opacity: 0,
-                        transition: 'opacity 0.3s ease',
-                      },
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        boxShadow: '0 12px 48px rgba(102, 126, 234, 0.15)',
-                        transform: 'translateY(-6px)',
-                        borderColor: 'transparent',
-                        '&::before': {
-                          opacity: 1,
-                        },
+                        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
+                        transform: 'translateY(-2px)',
+                        borderColor: '#003580',
                       },
                     }}
                   >
                     <CardActionArea
                       onClick={() => navigate(`/search/${searchId}/hotel/${hotel.id}`)}
-                      sx={{ 
-                        '&:hover .MuiCardActionArea-focusHighlight': {
-                          opacity: 0,
-                        },
-                      }}
                     >
-                      <CardContent sx={{ p: 4 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: { xs: 'column', md: 'row' },
+                        }}
+                      >
+                        {/* Image */}
+                        <Box
+                          sx={{
+                            width: { xs: '100%', md: '280px' },
+                            height: { xs: '200px', md: 'auto' },
+                            flexShrink: 0,
+                            position: 'relative',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <CardMedia
+                            component="img"
+                            image={imageUrl}
+                            alt={hotel.title}
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                            }}
+                          />
+                        </Box>
+
+                        {/* Content */}
                         <Box
                           sx={{
                             display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
-                            flexDirection: { xs: 'column', md: 'row' },
-                            gap: 3,
+                            flex: 1,
+                            flexDirection: { xs: 'column', sm: 'row' },
                           }}
                         >
-                          <Box sx={{ flex: 1, width: '100%' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5, flexWrap: 'wrap' }}>
+                          <CardContent
+                            sx={{
+                              flex: 1,
+                              p: 3,
+                              '&:last-child': { pb: 3 },
+                            }}
+                          >
+                            {/* Header */}
+                            <Box sx={{ mb: 1.5 }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                {Array.from({ length: hotel.star_rating }).map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    sx={{ fontSize: 16, color: '#fbbf24' }}
+                                  />
+                                ))}
+                              </Box>
                               <Typography
-                                variant="h5"
+                                variant="h6"
                                 sx={{
                                   fontWeight: 600,
-                                  color: '#1a1a1a',
-                                  fontSize: { xs: '1.25rem', md: '1.5rem' },
-                                  letterSpacing: '-0.01em',
+                                  color: '#003580',
+                                  mb: 0.5,
+                                  fontSize: '1.15rem',
                                 }}
                               >
                                 {hotel.title}
                               </Typography>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                {Array.from({ length: hotel.star_rating }).map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    sx={{ fontSize: 18, color: '#fbbf24' }}
-                                  />
-                                ))}
-                              </Box>
                             </Box>
+
+                            {/* Description */}
                             <Typography
                               variant="body2"
-                              sx={{ 
-                                color: '#666', 
-                                mb: 2.5, 
-                                maxWidth: { xs: '100%', md: '85%' },
-                                lineHeight: 1.6,
-                                fontWeight: 300,
+                              sx={{
+                                color: '#666',
+                                mb: 2,
+                                lineHeight: 1.5,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
                               }}
                             >
                               {hotel.description}
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+
+                            {/* Badges */}
+                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                               <Chip
-                                icon={<HotelIcon />}
-                                label={`${roomCount} ${roomCount === 1 ? 'room' : 'rooms'} available`}
+                                icon={<HotelIcon sx={{ fontSize: 14 }} />}
+                                label={`${roomCount} room${roomCount !== 1 ? 's' : ''}`}
                                 size="small"
                                 sx={{
-                                  borderRadius: 2,
-                                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)',
-                                  color: '#667eea',
+                                  height: 24,
+                                  bgcolor: '#f0f9ff',
+                                  color: '#0369a1',
                                   fontWeight: 500,
-                                  border: '1px solid rgba(102, 126, 234, 0.2)',
+                                  fontSize: '0.75rem',
+                                  '& .MuiChip-icon': { color: '#0369a1' },
                                 }}
                               />
                             </Box>
-                          </Box>
+                          </CardContent>
+
+                          {/* Price Section */}
                           <Box
                             sx={{
-                              textAlign: { xs: 'left', md: 'right' },
-                              minWidth: { md: '160px' },
-                              width: { xs: '100%', md: 'auto' },
                               display: 'flex',
-                              flexDirection: { xs: 'row', md: 'column' },
-                              justifyContent: { xs: 'space-between', md: 'flex-start' },
-                              alignItems: { xs: 'center', md: 'flex-end' },
+                              flexDirection: 'column',
+                              justifyContent: 'space-between',
+                              p: 3,
+                              minWidth: { sm: '180px' },
+                              textAlign: { xs: 'left', sm: 'right' },
+                              bgcolor: { xs: 'transparent', sm: '#fafbfc' },
+                              borderLeft: { xs: 'none', sm: '1px solid #e0e0e0' },
                             }}
                           >
                             <Box>
                               <Typography
                                 variant="caption"
                                 sx={{
-                                  color: '#999',
-                                  fontWeight: 400,
+                                  color: '#666',
                                   textTransform: 'uppercase',
                                   letterSpacing: '0.05em',
-                                  fontSize: '0.7rem',
+                                  fontSize: '0.65rem',
+                                  fontWeight: 600,
                                   display: 'block',
                                   mb: 0.5,
                                 }}
@@ -345,30 +352,48 @@ export default function ResultsPage() {
                                 variant="h4"
                                 sx={{
                                   fontWeight: 700,
-                                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                  WebkitBackgroundClip: 'text',
-                                  WebkitTextFillColor: 'transparent',
-                                  backgroundClip: 'text',
-                                  fontSize: { xs: '2rem', md: '2.5rem' },
-                                  letterSpacing: '-0.02em',
+                                  color: '#003580',
+                                  fontSize: '2rem',
+                                  lineHeight: 1,
+                                  mb: 0.5,
                                 }}
                               >
                                 ${bestPrice.toFixed(0)}
                               </Typography>
                               <Typography
-                                variant="body2"
+                                variant="caption"
                                 sx={{
-                                  color: '#999',
-                                  fontWeight: 300,
-                                  fontSize: '0.85rem',
+                                  color: '#666',
+                                  fontSize: '0.75rem',
+                                  display: 'block',
+                                  mb: 2,
                                 }}
                               >
                                 per night
                               </Typography>
                             </Box>
+
+                            <Button
+                              endIcon={<ArrowForward />}
+                              sx={{
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                bgcolor: '#003580',
+                                color: 'white',
+                                px: 2,
+                                py: 1,
+                                borderRadius: 1,
+                                fontSize: '0.9rem',
+                                '&:hover': {
+                                  bgcolor: '#00244d',
+                                },
+                              }}
+                            >
+                              View deals
+                            </Button>
                           </Box>
                         </Box>
-                      </CardContent>
+                      </Box>
                     </CardActionArea>
                   </Card>
                 </Fade>
