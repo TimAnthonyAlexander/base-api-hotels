@@ -125,7 +125,7 @@ export default function SearchForm({ onSubmit, loading = false, compact = false,
                     ...params.InputProps,
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LocationOn sx={{ color: '#667eea', fontSize: compact ? 18 : 20 }} />
+                        <LocationOn sx={{ color: '#003580', fontSize: compact ? 18 : 20 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -163,7 +163,7 @@ export default function SearchForm({ onSubmit, loading = false, compact = false,
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <CalendarToday sx={{ color: '#667eea', fontSize: compact ? 16 : 18 }} />
+                    <CalendarToday sx={{ color: '#003580', fontSize: compact ? 16 : 18 }} />
                   </InputAdornment>
                 ),
               }}
@@ -191,7 +191,7 @@ export default function SearchForm({ onSubmit, loading = false, compact = false,
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <CalendarToday sx={{ color: '#667eea', fontSize: compact ? 16 : 18 }} />
+                    <CalendarToday sx={{ color: '#003580', fontSize: compact ? 16 : 18 }} />
                   </InputAdornment>
                 ),
               }}
@@ -219,7 +219,7 @@ export default function SearchForm({ onSubmit, loading = false, compact = false,
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <People sx={{ color: '#667eea', fontSize: compact ? 16 : 18 }} />
+                    <People sx={{ color: '#003580', fontSize: compact ? 16 : 18 }} />
                   </InputAdornment>
                 ),
               }}
@@ -245,15 +245,17 @@ export default function SearchForm({ onSubmit, loading = false, compact = false,
                 textTransform: 'none',
                 fontSize: compact ? '0.95rem' : '1rem',
                 fontWeight: 600,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
-                transition: 'all 0.3s ease',
+                bgcolor: '#003580',
+                color: 'white',
+                boxShadow: '0 2px 8px rgba(0, 53, 128, 0.25)',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
-                  transform: 'translateY(-2px)',
+                  bgcolor: '#00244d',
+                  boxShadow: '0 4px 12px rgba(0, 53, 128, 0.35)',
+                  transform: 'translateY(-1px)',
                 },
                 '&:disabled': {
-                  background: '#ccc',
+                  bgcolor: '#ccc',
                 },
               }}
             >

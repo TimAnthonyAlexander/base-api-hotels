@@ -14,8 +14,17 @@ import {
   Divider,
   Fade,
   Grid,
+  Avatar,
 } from '@mui/material';
-import { ArrowBack, People, Star, CheckCircle, LocationOn } from '@mui/icons-material';
+import { 
+  ArrowBack, 
+  People, 
+  Star, 
+  CheckCircle, 
+  LocalOffer,
+  Bed,
+  ArrowForward,
+} from '@mui/icons-material';
 import { apiClient, type Hotel, type SearchResult, type Room } from '../lib/api';
 
 export default function HotelDetailPage() {
@@ -55,24 +64,12 @@ export default function HotelDetailPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%)',
+          bgcolor: '#fafafa',
         }}
       >
         <Box sx={{ textAlign: 'center' }}>
-          <CircularProgress 
-            size={60} 
-            sx={{ 
-              color: '#667eea',
-              mb: 2,
-            }} 
-          />
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: '#666',
-              fontWeight: 300,
-            }}
-          >
+          <CircularProgress size={60} sx={{ color: '#003580', mb: 2 }} />
+          <Typography variant="body1" sx={{ color: '#666', fontWeight: 400 }}>
             Loading hotel details...
           </Typography>
         </Box>
@@ -82,15 +79,9 @@ export default function HotelDetailPage() {
 
   if (error) {
     return (
-      <Box sx={{ minHeight: '100vh', background: '#fafafa', py: 8 }}>
+      <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa', py: 8 }}>
         <Container maxWidth="md">
-          <Alert 
-            severity="error" 
-            sx={{ 
-              borderRadius: 2,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-            }}
-          >
+          <Alert severity="error" sx={{ borderRadius: 2 }}>
             {error}
           </Alert>
         </Container>
@@ -108,382 +99,451 @@ export default function HotelDetailPage() {
     , room.offers[0]);
   };
 
+  const getOverallBestPrice = () => {
+    let minPrice = Infinity;
+    hotel.rooms.forEach((room) => {
+      room.offers.forEach((offer) => {
+        if (offer.effective_price < minPrice) {
+          minPrice = offer.effective_price;
+        }
+      });
+    });
+    return minPrice === Infinity ? 0 : minPrice;
+  };
+
+  // Placeholder images
+  const heroImage = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&auto=format&fit=crop';
+  const roomImages = [
+    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&auto=format&fit=crop',
+  ];
+
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(to bottom, #fafafa 0%, #ffffff 100%)' }}>
-      {/* Hero Header */}
+    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb' }}>
+      {/* Top Navigation */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          pt: 4,
-          pb: 12,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: -2,
-            left: 0,
-            right: 0,
-            height: '80px',
-            background: 'linear-gradient(to bottom, transparent, #fafafa)',
-          },
+          bgcolor: 'white',
+          borderBottom: '1px solid #e0e0e0',
+          py: 2,
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="lg">
           <Button
             startIcon={<ArrowBack />}
             onClick={() => navigate(`/search/${searchId}`)}
             sx={{
-              mb: 4,
-              color: 'white',
+              color: '#003580',
               textTransform: 'none',
-              fontWeight: 500,
-              fontSize: '1rem',
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(10px)',
-              px: 2.5,
-              py: 1,
-              borderRadius: 2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              transition: 'all 0.3s ease',
+              fontWeight: 600,
               '&:hover': {
-                background: 'rgba(255, 255, 255, 0.25)',
-                borderColor: 'rgba(255, 255, 255, 0.4)',
-                transform: 'translateX(-4px)',
+                bgcolor: 'rgba(0, 53, 128, 0.04)',
               },
             }}
           >
-            Back to Results
+            Back to results
           </Button>
-
-          <Fade in timeout={600}>
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-                <Typography
-                  variant="h2"
-                  component="h1"
-                  sx={{
-                    fontWeight: 600,
-                    letterSpacing: '-0.02em',
-                    color: 'white',
-                    fontSize: { xs: '2rem', md: '3rem' },
-                  }}
-                >
-                  {hotel.title}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  {Array.from({ length: hotel.star_rating }).map((_, i) => (
-                    <Star key={i} sx={{ fontSize: 28, color: '#fbbf24' }} />
-                  ))}
-                </Box>
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{ 
-                  color: 'rgba(255, 255, 255, 0.95)', 
-                  fontWeight: 300,
-                  maxWidth: '800px',
-                  lineHeight: 1.6,
-                  fontSize: { xs: '1rem', md: '1.15rem' },
-                }}
-              >
-                {hotel.description}
-              </Typography>
-            </Box>
-          </Fade>
         </Container>
       </Box>
 
-      {/* Content */}
-      <Container maxWidth="lg" sx={{ mt: -6, pb: 8 }}>
-        {/* Section Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h4"
+      {/* Hero Image */}
+      <Box
+        sx={{
+          height: { xs: '250px', md: '400px' },
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%), url(${heroImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          display: 'flex',
+          alignItems: 'flex-end',
+          position: 'relative',
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box sx={{ pb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              {Array.from({ length: hotel.star_rating }).map((_, i) => (
+                <Star key={i} sx={{ fontSize: 24, color: '#fbbf24' }} />
+              ))}
+            </Box>
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 700,
+                color: 'white',
+                textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                fontSize: { xs: '2rem', md: '3rem' },
+              }}
+            >
+              {hotel.title}
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
+
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Key Info Card */}
+        <Fade in timeout={400}>
+          <Card
+            elevation={0}
             sx={{
-              fontWeight: 600,
+              mb: 4,
+              borderRadius: 2,
+              border: '1px solid #e0e0e0',
+              bgcolor: 'white',
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={8}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 600,
+                      color: '#1a1a1a',
+                      mb: 1.5,
+                    }}
+                  >
+                    About this property
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: '#666',
+                      lineHeight: 1.7,
+                      mb: 2,
+                    }}
+                  >
+                    {hotel.description}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                    <Chip
+                      icon={<CheckCircle />}
+                      label="Free Wi-Fi"
+                      size="small"
+                      sx={{
+                        bgcolor: '#f0fdf4',
+                        color: '#15803d',
+                        fontWeight: 500,
+                      }}
+                    />
+                    <Chip
+                      icon={<CheckCircle />}
+                      label="24/7 Reception"
+                      size="small"
+                      sx={{
+                        bgcolor: '#f0fdf4',
+                        color: '#15803d',
+                        fontWeight: 500,
+                      }}
+                    />
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Box
+                    sx={{
+                      p: 3,
+                      borderRadius: 2,
+                      bgcolor: '#f0f9ff',
+                      border: '2px solid #003580',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: '#666',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        display: 'block',
+                        mb: 1,
+                      }}
+                    >
+                      Best Available Price
+                    </Typography>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        fontWeight: 700,
+                        color: '#003580',
+                        fontSize: '3rem',
+                        lineHeight: 1,
+                        mb: 0.5,
+                      }}
+                    >
+                      ${getOverallBestPrice().toFixed(0)}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: '#666',
+                        mb: 2,
+                      }}
+                    >
+                      per night
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: '#0369a1',
+                        fontWeight: 500,
+                      }}
+                    >
+                      See all {hotel.rooms.length} room options below
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Fade>
+
+        {/* Rooms & Offers Section */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
               color: '#1a1a1a',
-              mb: 1,
-              letterSpacing: '-0.01em',
+              mb: 0.5,
             }}
           >
             Available Rooms
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: '#666',
-              fontWeight: 300,
-            }}
-          >
-            Choose from {hotel.rooms.length} room {hotel.rooms.length === 1 ? 'option' : 'options'}
+          <Typography variant="body2" sx={{ color: '#666' }}>
+            {hotel.rooms.length} room {hotel.rooms.length === 1 ? 'type' : 'types'} with multiple booking options
           </Typography>
         </Box>
 
-        <Stack spacing={4}>
-          {hotel.rooms.map((room, index) => {
+        <Stack spacing={3}>
+          {hotel.rooms.map((room, roomIndex) => {
             const cheapestOffer = getCheapestOffer(room);
-            const hasDiscount = room.offers.some(offer => offer.discount > 0);
+            const roomImage = roomImages[roomIndex % roomImages.length];
 
             return (
-              <Fade in timeout={400 + (index * 100)} key={room.id}>
+              <Fade in timeout={500 + (roomIndex * 100)} key={room.id}>
                 <Card
                   elevation={0}
                   sx={{
-                    borderRadius: 3,
+                    borderRadius: 2,
                     border: '1px solid #e0e0e0',
+                    bgcolor: 'white',
                     overflow: 'hidden',
-                    background: 'white',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      boxShadow: '0 8px 32px rgba(102, 126, 234, 0.12)',
-                      borderColor: 'transparent',
-                    },
                   }}
                 >
-                  <CardContent sx={{ p: 0 }}>
-                    {/* Room Header */}
+                  {/* Room Header with Image */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      borderBottom: '1px solid #e0e0e0',
+                    }}
+                  >
+                    {/* Room Image */}
                     <Box
                       sx={{
-                        p: 4,
-                        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)',
-                        borderBottom: '1px solid #f0f0f0',
+                        width: { xs: '100%', sm: '200px' },
+                        height: { xs: '180px', sm: 'auto' },
+                        minHeight: { sm: '160px' },
+                        backgroundImage: `url(${roomImage})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        flexShrink: 0,
                       }}
-                    >
-                      <Grid container spacing={3} alignItems="center">
-                        <Grid item xs={12} md={8}>
-                          <Typography
-                            variant="h5"
-                            sx={{
-                              fontWeight: 600,
-                              color: '#1a1a1a',
-                              mb: 1.5,
-                              letterSpacing: '-0.01em',
-                            }}
-                          >
-                            {room.category}
-                          </Typography>
-                          <Typography
-                            variant="body1"
-                            sx={{ 
-                              color: '#666', 
-                              mb: 2,
-                              lineHeight: 1.6,
-                              fontWeight: 300,
-                            }}
-                          >
-                            {room.description}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-                            <Chip
-                              icon={<People />}
-                              label={`${room.capacity} ${room.capacity === 1 ? 'guest' : 'guests'}`}
-                              size="small"
-                              sx={{
-                                borderRadius: 2,
-                                background: 'white',
-                                color: '#667eea',
-                                fontWeight: 500,
-                                border: '1px solid rgba(102, 126, 234, 0.3)',
-                              }}
-                            />
-                            {hasDiscount && (
-                              <Chip
-                                label="Special Offers Available"
-                                size="small"
-                                sx={{
-                                  borderRadius: 2,
-                                  background: '#10b981',
-                                  color: 'white',
-                                  fontWeight: 500,
-                                }}
-                              />
-                            )}
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                          <Box
-                            sx={{
-                              textAlign: { xs: 'left', md: 'right' },
-                              p: 3,
-                              borderRadius: 2,
-                              background: 'white',
-                              border: '2px solid #667eea',
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: '#999',
-                                fontWeight: 500,
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                                fontSize: '0.7rem',
-                                display: 'block',
-                                mb: 0.5,
-                              }}
-                            >
-                              Best Price
-                            </Typography>
-                            <Typography
-                              variant="h3"
-                              sx={{
-                                fontWeight: 700,
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                                fontSize: '2.5rem',
-                                letterSpacing: '-0.02em',
-                                mb: 0.5,
-                              }}
-                            >
-                              ${cheapestOffer.effective_price.toFixed(0)}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              sx={{ 
-                                color: '#999',
-                                fontWeight: 300,
-                              }}
-                            >
-                              per night
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Box>
+                    />
 
-                    {/* Offers Section */}
-                    <Box sx={{ p: 4 }}>
+                    {/* Room Info */}
+                    <Box sx={{ p: 3, flex: 1 }}>
                       <Typography
-                        variant="subtitle2"
+                        variant="h6"
                         sx={{
                           fontWeight: 600,
                           color: '#1a1a1a',
-                          mb: 3,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.1em',
-                          fontSize: '0.8rem',
+                          mb: 1,
                         }}
                       >
-                        Booking Options ({room.offers.length})
+                        {room.category}
                       </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#666',
+                          mb: 2,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {room.description}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                        <Chip
+                          icon={<People sx={{ fontSize: 16 }} />}
+                          label={`${room.capacity} guest${room.capacity !== 1 ? 's' : ''}`}
+                          size="small"
+                          sx={{
+                            bgcolor: '#f0f9ff',
+                            color: '#0369a1',
+                            fontWeight: 500,
+                          }}
+                        />
+                        <Chip
+                          icon={<Bed sx={{ fontSize: 16 }} />}
+                          label="King bed"
+                          size="small"
+                          sx={{
+                            bgcolor: '#f9fafb',
+                            color: '#666',
+                            fontWeight: 500,
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  </Box>
 
-                      <Stack spacing={2.5}>
-                        {room.offers.map((offer, offerIndex) => (
-                          <Box
-                            key={offer.id}
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              p: 3,
-                              borderRadius: 2.5,
-                              background:
-                                offerIndex === 0
-                                  ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)'
-                                  : '#fafafa',
-                              border: offerIndex === 0 ? '2px solid #667eea' : '1px solid #e5e7eb',
-                              transition: 'all 0.3s ease',
-                              flexDirection: { xs: 'column', sm: 'row' },
-                              gap: { xs: 2, sm: 0 },
-                              '&:hover': {
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.15)',
-                              },
-                            }}
-                          >
-                            <Box sx={{ flex: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
-                                {offerIndex === 0 && (
-                                  <Chip
-                                    icon={<CheckCircle sx={{ fontSize: 16 }} />}
-                                    label="Best Deal"
-                                    size="small"
-                                    sx={{
-                                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                      color: 'white',
-                                      fontWeight: 600,
-                                      height: 26,
-                                      fontSize: '0.75rem',
-                                    }}
-                                  />
-                                )}
-                                {offer.discount > 0 && (
-                                  <Chip
-                                    label={`Save ${offer.discount.toFixed(0)}%`}
-                                    size="small"
-                                    sx={{
-                                      background: '#10b981',
-                                      color: 'white',
-                                      fontWeight: 600,
-                                      height: 26,
-                                      fontSize: '0.75rem',
-                                    }}
-                                  />
-                                )}
-                              </Box>
-                              <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                  color: '#666',
-                                  fontSize: '0.9rem',
-                                  fontWeight: 400,
-                                }}
-                              >
-                                Available: {new Date(offer.starts_on).toLocaleDateString()} - {new Date(offer.ends_on).toLocaleDateString()}
-                              </Typography>
+                  {/* Offers List */}
+                  <Box sx={{ p: 3 }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: 600,
+                        color: '#1a1a1a',
+                        mb: 2,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        fontSize: '0.75rem',
+                      }}
+                    >
+                      Booking Options ({room.offers.length})
+                    </Typography>
+
+                    <Stack spacing={2}>
+                      {room.offers.map((offer, offerIndex) => (
+                        <Box
+                          key={offer.id}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            p: 2.5,
+                            borderRadius: 1.5,
+                            border: offerIndex === 0 ? '2px solid #003580' : '1px solid #e0e0e0',
+                            bgcolor: offerIndex === 0 ? '#f0f9ff' : 'white',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            gap: 2,
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                            },
+                          }}
+                        >
+                          <Box sx={{ flex: 1, width: '100%' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                              {offerIndex === 0 && (
+                                <Chip
+                                  icon={<LocalOffer sx={{ fontSize: 14 }} />}
+                                  label="Best Deal"
+                                  size="small"
+                                  sx={{
+                                    height: 24,
+                                    bgcolor: '#003580',
+                                    color: 'white',
+                                    fontWeight: 600,
+                                    fontSize: '0.7rem',
+                                  }}
+                                />
+                              )}
+                              {offer.discount > 0 && (
+                                <Chip
+                                  label={`${offer.discount.toFixed(0)}% OFF`}
+                                  size="small"
+                                  sx={{
+                                    height: 24,
+                                    bgcolor: '#10b981',
+                                    color: 'white',
+                                    fontWeight: 600,
+                                    fontSize: '0.7rem',
+                                  }}
+                                />
+                              )}
                             </Box>
-                            <Box 
-                              sx={{ 
-                                textAlign: { xs: 'left', sm: 'right' },
-                                width: { xs: '100%', sm: 'auto' },
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: { xs: 'flex-start', sm: 'flex-end' },
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: '#666',
+                                fontSize: '0.85rem',
                               }}
                             >
+                              Available: {new Date(offer.starts_on).toLocaleDateString()} - {new Date(offer.ends_on).toLocaleDateString()}
+                            </Typography>
+                          </Box>
+
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 2,
+                              width: { xs: '100%', sm: 'auto' },
+                              justifyContent: { xs: 'space-between', sm: 'flex-end' },
+                            }}
+                          >
+                            <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
                               {offer.discount > 0 && (
                                 <Typography
                                   variant="body2"
                                   sx={{
                                     color: '#999',
                                     textDecoration: 'line-through',
-                                    mb: 0.5,
-                                    fontSize: '0.9rem',
+                                    fontSize: '0.85rem',
                                   }}
                                 >
                                   ${offer.price.toFixed(2)}
                                 </Typography>
                               )}
                               <Typography
-                                variant="h4"
+                                variant="h5"
                                 sx={{
                                   fontWeight: 700,
-                                  color: offerIndex === 0 ? '#667eea' : '#1a1a1a',
-                                  fontSize: '2rem',
-                                  letterSpacing: '-0.01em',
+                                  color: '#003580',
+                                  fontSize: '1.75rem',
+                                  lineHeight: 1,
                                 }}
                               >
-                                ${offer.effective_price.toFixed(2)}
+                                ${offer.effective_price.toFixed(0)}
                               </Typography>
                               <Typography
-                                variant="body2"
-                                sx={{ 
-                                  color: '#999',
-                                  fontSize: '0.85rem',
-                                  fontWeight: 300,
+                                variant="caption"
+                                sx={{
+                                  color: '#666',
+                                  fontSize: '0.75rem',
                                 }}
                               >
                                 per night
                               </Typography>
                             </Box>
+                            <Button
+                              endIcon={<ArrowForward />}
+                              sx={{
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                bgcolor: '#003580',
+                                color: 'white',
+                                px: 2.5,
+                                py: 1,
+                                borderRadius: 1,
+                                whiteSpace: 'nowrap',
+                                '&:hover': {
+                                  bgcolor: '#00244d',
+                                },
+                              }}
+                            >
+                              Book
+                            </Button>
                           </Box>
-                        ))}
-                      </Stack>
-                    </Box>
-                  </CardContent>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Box>
                 </Card>
               </Fade>
             );
