@@ -74,6 +74,9 @@ export interface GetSearchBySearch_idRequestPath {
 
 export interface GetSearchBySearch_idRequestQuery {
   location_id?: string;
+  starts_on?: string;
+  ends_on?: string;
+  capacity?: number;
 }
 
 export type GetSearchBySearch_idResponse = Envelope<any>;
@@ -81,6 +84,9 @@ export type GetSearchBySearch_idResponse = Envelope<any>;
 export interface PostSearchRequestBody {
   search_id?: string;
   location_id?: string;
+  starts_on?: string;
+  ends_on?: string;
+  capacity?: number;
 }
 
 export type PostSearchResponse = Envelope<any>;

@@ -413,6 +413,30 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "starts_on",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ends_on",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "capacity",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
                 ],
                 "responses": {
@@ -473,6 +497,15 @@
                                     },
                                     "location_id": {
                                         "type": "string"
+                                    },
+                                    "starts_on": {
+                                        "type": "string"
+                                    },
+                                    "ends_on": {
+                                        "type": "string"
+                                    },
+                                    "capacity": {
+                                        "type": "integer"
                                     }
                                 }
                             }
