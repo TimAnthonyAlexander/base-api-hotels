@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -17,6 +17,7 @@ import {
   Link,
   InputAdornment,
   Chip,
+  Avatar,
 } from '@mui/material';
 import {
   LocationOn,
@@ -27,8 +28,23 @@ import {
   CalendarToday,
   People,
   Star,
+  TrendingUp,
+  LocalOffer,
+  Speed,
 } from '@mui/icons-material';
 import { apiClient, type LocationOption } from '../lib/api';
+
+// Helper to get date strings
+const getTodayString = () => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
+
+const getTomorrowString = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().split('T')[0];
+};
 
 // Featured destinations data
 const featuredDestinations = [
@@ -72,26 +88,57 @@ const featuredDestinations = [
 
 // Quick category suggestions
 const quickCategories = [
-  { label: 'Popular right now', query: 'Munich' },
-  { label: 'Weekend Getaways', query: 'Berlin' },
-  { label: 'Budget Stays', query: 'Prague' },
-  { label: 'Family-friendly', query: 'Vienna' },
+  { label: 'Munich', icon: '🏔️' },
+  { label: 'Berlin', icon: '🎨' },
+  { label: 'Amsterdam', icon: '🚲' },
+  { label: 'Paris', icon: '🗼' },
+  { label: 'Vienna', icon: '🎻' },
 ];
 
-// Trust indicators
+// Trust indicators - enhanced
 const trustFeatures = [
-  { icon: CheckCircleOutline, text: 'Real-time availability' },
-  { icon: VerifiedUser, text: 'Verified partners' },
-  { icon: MoneyOff, text: 'No hidden fees' },
-  { icon: CompareArrows, text: 'Compare dozens of sites' },
+  { 
+    icon: CompareArrows, 
+    title: 'All major booking sites', 
+    subtitle: 'One search',
+    color: '#667eea',
+  },
+  { 
+    icon: Speed, 
+    title: 'Real-time prices', 
+    subtitle: 'Always current',
+    color: '#764ba2',
+  },
+  { 
+    icon: VerifiedUser, 
+    title: 'Verified partners', 
+    subtitle: 'Trusted sources',
+    color: '#f093fb',
+  },
+  { 
+    icon: LocalOffer, 
+    title: 'Best deals guaranteed', 
+    subtitle: 'No hidden fees',
+    color: '#4facfe',
+  },
+];
+
+// Partner logos placeholder
+const partnerLogos = [
+  'Booking.com',
+  'Expedia',
+  'Hotels.com',
+  'Agoda',
+  'Trivago',
+  'Kayak',
 ];
 
 export default function SearchPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     location_id: '',
-    starts_on: '',
-    ends_on: '',
+    starts_on: getTodayString(),
+    ends_on: getTomorrowString(),
     capacity: 1,
   });
   const [selectedLocation, setSelectedLocation] = useState<LocationOption | null>(null);
@@ -150,12 +197,12 @@ export default function SearchPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#fafafa' }}>
-      {/* Hero Section */}
+      {/* Hero Section with City Background */}
       <Box
         sx={{
           position: 'relative',
-          minHeight: { xs: '70vh', md: '60vh' },
-          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.12) 100%)',
+          minHeight: { xs: '75vh', md: '65vh' },
+          background: 'linear-gradient(135deg, rgba(0, 53, 128, 0.85) 0%, rgba(102, 126, 234, 0.9) 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -168,53 +215,75 @@ export default function SearchPage() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%)',
-            pointerEvents: 'none',
+            backgroundImage: 'url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&auto=format&fit=crop")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.3,
+            zIndex: 0,
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: -2,
+            left: 0,
+            right: 0,
+            height: '100px',
+            background: 'linear-gradient(to bottom, transparent, #fafafa)',
+            zIndex: 1,
           },
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
           <Box sx={{ textAlign: 'center', mb: 5 }}>
             <Typography
-              variant="h2"
+              variant="h1"
               sx={{
-                fontWeight: 600,
-                fontSize: { xs: '2.5rem', md: '3.5rem' },
+                fontWeight: 700,
+                fontSize: { xs: '2.5rem', md: '4rem' },
                 letterSpacing: '-0.02em',
-                color: '#1a1a1a',
+                color: 'white',
                 mb: 2,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                textShadow: '0 4px 20px rgba(0,0,0,0.3)',
               }}
             >
               Find your perfect stay
             </Typography>
             <Typography
-              variant="h6"
+              variant="h5"
               sx={{
-                fontWeight: 300,
-                color: '#666',
-                maxWidth: '600px',
+                fontWeight: 400,
+                color: 'rgba(255, 255, 255, 0.95)',
+                maxWidth: '700px',
                 mx: 'auto',
+                textShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                mb: 1,
               }}
             >
-              Compare hotels from multiple sources in one click.
+              Compare hotels from multiple sources in one click
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 300,
+                color: 'rgba(255, 255, 255, 0.85)',
+                textShadow: '0 2px 10px rgba(0,0,0,0.2)',
+              }}
+            >
+              All major booking sites. Best prices guaranteed.
             </Typography>
           </Box>
 
           {/* Search Bar Card */}
           <Paper
-            elevation={4}
+            elevation={8}
             sx={{
-              p: { xs: 3, md: 4 },
+              p: { xs: 3, md: 3.5 },
               borderRadius: 4,
-              maxWidth: '1000px',
+              maxWidth: '1100px',
               mx: 'auto',
               background: 'rgba(255, 255, 255, 0.98)',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 30px 80px rgba(0, 0, 0, 0.3)',
             }}
           >
             {error && (
@@ -229,7 +298,7 @@ export default function SearchPage() {
 
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2} alignItems="flex-start">
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={4}>
                   <Autocomplete
                     value={selectedLocation}
                     onChange={(_, newValue) => {
@@ -251,12 +320,12 @@ export default function SearchPage() {
                         {...params}
                         label="Where"
                         required
-                        placeholder="City or location"
+                        placeholder="Munich, Berlin, or Paris"
                         InputProps={{
                           ...params.InputProps,
                           startAdornment: (
                             <InputAdornment position="start">
-                              <LocationOn sx={{ color: '#667eea' }} />
+                              <LocationOn sx={{ color: '#003580' }} />
                             </InputAdornment>
                           ),
                           endAdornment: (
@@ -271,6 +340,7 @@ export default function SearchPage() {
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             borderRadius: 2,
+                            bgcolor: 'white',
                           },
                         }}
                       />
@@ -292,13 +362,14 @@ export default function SearchPage() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <CalendarToday sx={{ color: '#667eea' }} />
+                          <CalendarToday sx={{ color: '#003580' }} />
                         </InputAdornment>
                       ),
                     }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
+                        bgcolor: 'white',
                       },
                     }}
                   />
@@ -318,19 +389,20 @@ export default function SearchPage() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <CalendarToday sx={{ color: '#667eea' }} />
+                          <CalendarToday sx={{ color: '#003580' }} />
                         </InputAdornment>
                       ),
                     }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
+                        bgcolor: 'white',
                       },
                     }}
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={2}>
+                <Grid item xs={12} sm={6} md={1.5}>
                   <TextField
                     label="Guests"
                     type="number"
@@ -344,19 +416,20 @@ export default function SearchPage() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <People sx={{ color: '#667eea' }} />
+                          <People sx={{ color: '#003580' }} />
                         </InputAdornment>
                       ),
                     }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
+                        bgcolor: 'white',
                       },
                     }}
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={2}>
+                <Grid item xs={12} sm={6} md={1.5}>
                   <Button
                     type="submit"
                     variant="contained"
@@ -369,14 +442,15 @@ export default function SearchPage() {
                       borderRadius: 2,
                       textTransform: 'none',
                       fontSize: '1.1rem',
-                      fontWeight: 600,
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
+                      fontWeight: 700,
+                      bgcolor: '#003580',
+                      color: 'white',
+                      boxShadow: '0 4px 20px rgba(0, 53, 128, 0.4)',
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        background: 'linear-gradient(135deg, #5568d3 0%, #6a3f8a 100%)',
-                        boxShadow: '0 6px 30px rgba(102, 126, 234, 0.4)',
-                        transform: 'translateY(-2px)',
+                        bgcolor: '#00244d',
+                        boxShadow: '0 8px 30px rgba(0, 53, 128, 0.5)',
+                        transform: 'translateY(-3px)',
                       },
                     }}
                   >
@@ -386,99 +460,191 @@ export default function SearchPage() {
               </Grid>
             </form>
           </Paper>
+
+          {/* Quick City Chips */}
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              mt: 3,
+              px: 2,
+            }}
+          >
+            {quickCategories.map((category, index) => (
+              <Chip
+                key={index}
+                label={`${category.icon} ${category.label}`}
+                onClick={() => prefillLocation(category.label)}
+                sx={{
+                  py: 2.5,
+                  px: 2,
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  backdropFilter: 'blur(10px)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: 3,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    color: '#003580',
+                    borderColor: 'white',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
+                  },
+                }}
+              />
+            ))}
+          </Box>
         </Container>
       </Box>
 
-      {/* Quick Categories */}
-      <Container maxWidth="lg" sx={{ mt: -3, mb: 6, position: 'relative', zIndex: 2 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            overflowX: 'auto',
-            pb: 2,
-            px: 1,
-            '&::-webkit-scrollbar': {
-              height: 6,
-            },
-            '&::-webkit-scrollbar-track': {
-              background: '#f1f1f1',
-              borderRadius: 3,
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: '#667eea',
-              borderRadius: 3,
-            },
-          }}
-        >
-          {quickCategories.map((category, index) => (
-            <Chip
-              key={index}
-              label={category.label}
-              onClick={() => prefillLocation(category.query)}
-              sx={{
-                py: 2.5,
-                px: 1,
-                fontSize: '0.95rem',
-                fontWeight: 500,
-                background: 'white',
-                border: '1px solid #e0e0e0',
-                borderRadius: 3,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  borderColor: 'transparent',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)',
-                },
-              }}
-            />
-          ))}
-        </Box>
-      </Container>
-
-      {/* Trust Strip */}
+      {/* Social Proof - Partner Logos */}
       <Box
         sx={{
           bgcolor: 'white',
           py: 4,
-          borderTop: '1px solid #f0f0f0',
           borderBottom: '1px solid #f0f0f0',
         }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={3} justifyContent="center">
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: 'center',
+              color: '#999',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontSize: '0.75rem',
+              mb: 3,
+            }}
+          >
+            Trusted by travelers across Europe · Comparing prices from
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: { xs: 3, md: 5 },
+              flexWrap: 'wrap',
+            }}
+          >
+            {partnerLogos.map((partner, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: '#f5f5f5',
+                    color: '#666',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  {partner.charAt(0)}
+                </Avatar>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#666',
+                    fontWeight: 500,
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  {partner}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Trust Strip - Enhanced */}
+      <Box
+        sx={{
+          bgcolor: 'white',
+          py: 5,
+          borderBottom: '1px solid #f0f0f0',
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4} justifyContent="center">
             {trustFeatures.map((feature, index) => (
-              <Grid item xs={6} sm={3} key={index}>
+              <Grid item xs={6} md={3} key={index}>
                 <Box
                   sx={{
                     textAlign: 'center',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 1,
+                    gap: 1.5,
+                    p: 2,
+                    borderRadius: 3,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      '& .feature-icon': {
+                        transform: 'scale(1.1)',
+                      },
+                    },
                   }}
                 >
-                  <feature.icon
+                  <Box
+                    className="feature-icon"
                     sx={{
-                      fontSize: 40,
-                      color: '#667eea',
-                      mb: 0.5,
-                    }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 500,
-                      color: '#333',
-                      fontSize: '0.9rem',
+                      width: 64,
+                      height: 64,
+                      borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${feature.color}15 0%, ${feature.color}25 100%)`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.3s ease',
                     }}
                   >
-                    {feature.text}
-                  </Typography>
+                    <feature.icon
+                      sx={{
+                        fontSize: 32,
+                        color: feature.color,
+                      }}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: 700,
+                        color: '#1a1a1a',
+                        fontSize: '1rem',
+                        mb: 0.5,
+                      }}
+                    >
+                      {feature.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: '#666',
+                        fontWeight: 400,
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      {feature.subtitle}
+                    </Typography>
+                  </Box>
                 </Box>
               </Grid>
             ))}
@@ -486,28 +652,55 @@ export default function SearchPage() {
         </Container>
       </Box>
 
-      {/* Featured Destinations */}
+      {/* Featured Destinations with "Popular This Week" Header */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Box sx={{ mb: 5, textAlign: 'center' }}>
-          <Typography
-            variant="h4"
+          <Box
             sx={{
-              fontWeight: 600,
-              color: '#1a1a1a',
-              mb: 1,
-              letterSpacing: '-0.01em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: 2,
+              px: 2,
+              py: 0.5,
+              bgcolor: 'rgba(102, 126, 234, 0.08)',
+              borderRadius: 2,
             }}
           >
-            Explore popular destinations
+            <TrendingUp sx={{ color: '#667eea', fontSize: 20 }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#667eea',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+              }}
+            >
+              Popular This Week
+            </Typography>
+          </Box>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 700,
+              color: '#1a1a1a',
+              mb: 1,
+              letterSpacing: '-0.02em',
+              fontSize: { xs: '2rem', md: '2.5rem' },
+            }}
+          >
+            Top destinations across Europe
           </Typography>
           <Typography
             variant="body1"
             sx={{
               color: '#666',
               fontWeight: 300,
+              fontSize: '1.1rem',
             }}
           >
-            Discover amazing stays in cities across Europe
+            Discover amazing stays in the most sought-after cities
           </Typography>
         </Box>
 
@@ -522,17 +715,22 @@ export default function SearchPage() {
                   borderRadius: 3,
                   overflow: 'hidden',
                   transition: 'all 0.3s ease',
-                  boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+                  boxShadow: '0 2px 16px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid #f0f0f0',
                   '&:hover': {
                     transform: 'translateY(-8px)',
-                    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.12)',
+                    boxShadow: '0 16px 48px rgba(0, 0, 0, 0.15)',
+                    borderColor: 'transparent',
                     '& .destination-image': {
-                      transform: 'scale(1.05)',
+                      transform: 'scale(1.08)',
+                    },
+                    '& .destination-overlay': {
+                      background: 'linear-gradient(to top, rgba(0,53,128,0.85) 0%, transparent 100%)',
                     },
                   },
                 }}
               >
-                <Box sx={{ position: 'relative', paddingTop: '66.67%', overflow: 'hidden' }}>
+                <Box sx={{ position: 'relative', paddingTop: '75%', overflow: 'hidden' }}>
                   <CardMedia
                     component="img"
                     image={destination.image}
@@ -545,25 +743,28 @@ export default function SearchPage() {
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
-                      transition: 'transform 0.5s ease',
+                      transition: 'transform 0.6s ease',
                     }}
                   />
                   <Box
+                    className="destination-overlay"
                     sx={{
                       position: 'absolute',
                       bottom: 0,
                       left: 0,
                       right: 0,
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)',
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)',
                       p: 3,
+                      transition: 'all 0.3s ease',
                     }}
                   >
                     <Typography
                       variant="h5"
                       sx={{
                         color: 'white',
-                        fontWeight: 600,
+                        fontWeight: 700,
                         mb: 0.5,
+                        fontSize: '1.5rem',
                       }}
                     >
                       {destination.city}
@@ -572,7 +773,8 @@ export default function SearchPage() {
                       variant="body2"
                       sx={{
                         color: 'rgba(255, 255, 255, 0.9)',
-                        fontWeight: 300,
+                        fontWeight: 400,
+                        fontSize: '0.95rem',
                       }}
                     >
                       from €{destination.priceFrom}/night
@@ -586,16 +788,17 @@ export default function SearchPage() {
       </Container>
 
       {/* Example Search Result Teaser */}
-      <Box sx={{ bgcolor: 'white', py: 8 }}>
+      <Box sx={{ bgcolor: '#f9f9f9', py: 8 }}>
         <Container maxWidth="lg">
           <Box sx={{ mb: 5, textAlign: 'center' }}>
             <Typography
-              variant="h4"
+              variant="h3"
               sx={{
-                fontWeight: 600,
+                fontWeight: 700,
                 color: '#1a1a1a',
                 mb: 1,
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.02em',
+                fontSize: { xs: '2rem', md: '2.5rem' },
               }}
             >
               What you'll discover
@@ -605,18 +808,20 @@ export default function SearchPage() {
               sx={{
                 color: '#666',
                 fontWeight: 300,
+                fontSize: '1.1rem',
               }}
             >
-              Preview of search results you can expect
+              Detailed hotel information with real-time pricing
             </Typography>
           </Box>
 
-          <Box sx={{ maxWidth: '800px', mx: 'auto' }}>
+          <Box sx={{ maxWidth: '900px', mx: 'auto' }}>
             <Card
               sx={{
                 borderRadius: 3,
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
                 overflow: 'hidden',
+                border: '2px solid #f0f0f0',
               }}
             >
               <Grid container>
@@ -626,7 +831,7 @@ export default function SearchPage() {
                     image="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop"
                     alt="Example hotel"
                     sx={{
-                      height: { xs: 200, md: '100%' },
+                      height: { xs: 240, md: '100%' },
                       objectFit: 'cover',
                     }}
                   />
@@ -638,18 +843,19 @@ export default function SearchPage() {
                         <Star
                           key={star}
                           sx={{
-                            fontSize: 18,
+                            fontSize: 20,
                             color: '#ffa726',
                           }}
                         />
                       ))}
                     </Box>
                     <Typography
-                      variant="h5"
+                      variant="h4"
                       sx={{
-                        fontWeight: 600,
+                        fontWeight: 700,
                         mb: 1,
                         color: '#1a1a1a',
+                        fontSize: '1.75rem',
                       }}
                     >
                       Grand Plaza Hotel
@@ -659,20 +865,21 @@ export default function SearchPage() {
                       sx={{
                         color: '#666',
                         mb: 2,
-                        fontWeight: 300,
+                        fontWeight: 400,
                       }}
                     >
-                      City Center, Munich
+                      📍 City Center, Munich
                     </Typography>
                     <Typography
                       variant="body1"
                       sx={{
                         color: '#333',
                         mb: 3,
-                        lineHeight: 1.6,
+                        lineHeight: 1.7,
+                        fontWeight: 300,
                       }}
                     >
-                      Luxury hotel featuring spacious rooms, rooftop terrace, spa facilities, and fine dining restaurant.
+                      Luxury hotel featuring spacious rooms, rooftop terrace, spa facilities, and fine dining restaurant in the heart of the city.
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Box>
@@ -681,25 +888,27 @@ export default function SearchPage() {
                           sx={{
                             color: '#666',
                             display: 'block',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            fontSize: '0.7rem',
+                            mb: 0.5,
                           }}
                         >
                           Starting from
                         </Typography>
                         <Typography
-                          variant="h4"
+                          variant="h3"
                           sx={{
-                            fontWeight: 700,
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
+                            fontWeight: 800,
+                            color: '#003580',
+                            fontSize: '2.5rem',
                           }}
                         >
                           €129
                           <Typography
                             component="span"
-                            variant="body2"
-                            sx={{ color: '#666', fontWeight: 400 }}
+                            variant="body1"
+                            sx={{ color: '#666', fontWeight: 400, fontSize: '1rem' }}
                           >
                             /night
                           </Typography>
@@ -709,9 +918,10 @@ export default function SearchPage() {
                         label="Example result"
                         size="small"
                         sx={{
-                          bgcolor: 'rgba(102, 126, 234, 0.1)',
-                          color: '#667eea',
-                          fontWeight: 500,
+                          bgcolor: 'rgba(0, 53, 128, 0.08)',
+                          color: '#003580',
+                          fontWeight: 600,
+                          px: 1,
                         }}
                       />
                     </Box>
@@ -729,21 +939,18 @@ export default function SearchPage() {
           bgcolor: '#1a1a1a',
           color: 'white',
           py: 6,
-          mt: 8,
+          mt: 0,
         }}
       >
         <Container maxWidth="lg">
           <Grid container spacing={4} justifyContent="space-between" alignItems="center">
             <Grid item xs={12} md={6}>
               <Typography
-                variant="h6"
+                variant="h5"
                 sx={{
-                  fontWeight: 600,
+                  fontWeight: 700,
                   mb: 1,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  color: 'white',
                 }}
               >
                 Hotel Comparison
@@ -753,9 +960,19 @@ export default function SearchPage() {
                 sx={{
                   color: 'rgba(255, 255, 255, 0.7)',
                   fontWeight: 300,
+                  mb: 2,
                 }}
               >
-                Built with BaseAPI · Compare smarter.
+                Built with BaseAPI · Compare smarter, travel better.
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  fontSize: '0.75rem',
+                }}
+              >
+                © 2025 Hotel Comparison. All rights reserved.
               </Typography>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -773,7 +990,7 @@ export default function SearchPage() {
                     color: 'rgba(255, 255, 255, 0.7)',
                     textDecoration: 'none',
                     fontSize: '0.9rem',
-                    fontWeight: 400,
+                    fontWeight: 500,
                     transition: 'color 0.2s ease',
                     '&:hover': {
                       color: '#667eea',
@@ -788,7 +1005,7 @@ export default function SearchPage() {
                     color: 'rgba(255, 255, 255, 0.7)',
                     textDecoration: 'none',
                     fontSize: '0.9rem',
-                    fontWeight: 400,
+                    fontWeight: 500,
                     transition: 'color 0.2s ease',
                     '&:hover': {
                       color: '#667eea',
@@ -803,7 +1020,7 @@ export default function SearchPage() {
                     color: 'rgba(255, 255, 255, 0.7)',
                     textDecoration: 'none',
                     fontSize: '0.9rem',
-                    fontWeight: 400,
+                    fontWeight: 500,
                     transition: 'color 0.2s ease',
                     '&:hover': {
                       color: '#667eea',
@@ -811,6 +1028,21 @@ export default function SearchPage() {
                   }}
                 >
                   Privacy
+                </Link>
+                <Link
+                  href="#"
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    textDecoration: 'none',
+                    fontSize: '0.9rem',
+                    fontWeight: 500,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#667eea',
+                    },
+                  }}
+                >
+                  Terms
                 </Link>
               </Box>
             </Grid>
