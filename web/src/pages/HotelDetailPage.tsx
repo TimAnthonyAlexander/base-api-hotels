@@ -14,7 +14,7 @@ import {
   Divider,
 } from '@mui/material';
 import { ArrowBack, People, Star } from '@mui/icons-material';
-import { apiClient, Hotel, SearchResult, Room } from '../lib/api';
+import { apiClient, type Hotel, type SearchResult, type Room } from '../lib/api';
 
 export default function HotelDetailPage() {
   const { searchId, hotelId } = useParams<{ searchId: string; hotelId: string }>();

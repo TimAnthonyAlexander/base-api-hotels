@@ -13,7 +13,7 @@ import {
   Stack,
 } from '@mui/material';
 import { Hotel as HotelIcon, Star } from '@mui/icons-material';
-import { apiClient, Hotel, SearchResult } from '../lib/api';
+import { apiClient, type Hotel, type SearchResult } from '../lib/api';
 
 export default function ResultsPage() {
   const { searchId } = useParams<{ searchId: string }>();
