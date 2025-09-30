@@ -32,9 +32,7 @@ class LocationAutocompleteController extends Controller
 
         // Get all locations and filter in PHP for cross-database compatibility
         // This approach works with SQLite, MySQL, and PostgreSQL
-        $allLocations = Location::query()
-            ->orderBy('name', 'asc')
-            ->get();
+        $allLocations = Location::query()->get();
 
         // Filter locations by searching name, city, or country (case-insensitive)
         $searchTerm = strtolower($this->query);
