@@ -93,6 +93,11 @@ $router->post('/search', [
 ]);
 
 // Booking management
+$router->get('/bookings', [
+    CombinedAuthMiddleware::class,
+    BookingController::class,
+]);
+
 $router->get('/bookings/{booking_id}', [
     CombinedAuthMiddleware::class,
     BookingController::class,

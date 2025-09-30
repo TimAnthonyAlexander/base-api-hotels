@@ -190,6 +190,23 @@ export default function ResultsPage() {
                     {user.name}
                   </Typography>
                   <Button
+                    onClick={() => navigate('/bookings')}
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderColor: '#003580',
+                      color: '#003580',
+                      '&:hover': {
+                        bgcolor: 'rgba(0, 53, 128, 0.04)',
+                        borderColor: '#003580',
+                      },
+                    }}
+                  >
+                    My Bookings
+                  </Button>
+                  <Button
                     onClick={handleLogout}
                     variant="outlined"
                     size="small"

@@ -313,6 +313,25 @@ export default function SearchPage() {
                           Welcome, {user.name}
                         </Typography>
                         <Button
+                          component={RouterLink}
+                          to="/bookings"
+                          sx={{
+                            color: 'white',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            px: 3,
+                            borderRadius: 2,
+                            border: '1px solid rgba(255, 255, 255, 0.3)',
+                            '&:hover': {
+                              bgcolor: 'rgba(255, 255, 255, 0.1)',
+                              borderColor: 'rgba(255, 255, 255, 0.5)',
+                            },
+                          }}
+                        >
+                          My Bookings
+                        </Button>
+                        <Button
                           onClick={handleLogout}
                           sx={{
                             color: 'white',

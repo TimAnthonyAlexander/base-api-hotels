@@ -4,6 +4,7 @@ import SearchPage from './pages/SearchPage';
 import ResultsPage from './pages/ResultsPage';
 import HotelDetailPage from './pages/HotelDetailPage';
 import BookingDetailPage from './pages/BookingDetailPage';
+import BookingsListPage from './pages/BookingsListPage';
 import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 
@@ -68,6 +69,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/search/:searchId" element={<ResultsPage />} />
           <Route path="/search/:searchId/hotel/:hotelId" element={<HotelDetailPage />} />
+          <Route path="/bookings" element={<BookingsListPage />} />
           <Route path="/booking/:bookingId" element={<BookingDetailPage />} />
         </Routes>
       </BrowserRouter>

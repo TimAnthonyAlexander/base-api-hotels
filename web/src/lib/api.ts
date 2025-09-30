@@ -122,6 +122,10 @@ class ApiClient {
     }
 
     // Booking endpoints
+    async listBookings(): Promise<ApiResponse<{ bookings: BookingListItem[] }>> {
+        return this.get('/bookings');
+    }
+
     async createBooking(params: {
         search_id: string;
         hotel_id: string;
@@ -218,6 +222,13 @@ export interface BookingDetail {
     room: Room;
     offer: Offer;
     search: Search;
+}
+
+export interface BookingListItem {
+    booking: Booking;
+    hotel: Hotel;
+    room: Room;
+    offer: Offer;
 }
 
 export const apiClient = new ApiClient();

@@ -30,6 +30,42 @@ class BookingController extends Controller
 
     public function get(): JsonResponse
     {
+        $userId = $this->request->user['id'] ?? '';
+
+        if (!$userId) {
+            return JsonResponse::error('Unauthorized', 401);
+        }
+
+        // If no booking_id is provided, list all bookings
+        if ($this->booking_id === '' || $this->booking_id === '0') {
+            // Get all bookings for this user, ordered by newest first
+            $bookings = Booking::where('user_id', '=', $userId)
+                ->orderBy('created_at', 'DESC')
+                ->get();
+
+            // Load related data for each booking
+            $bookingsWithDetails = [];
+            foreach ($bookings as $booking) {
+                assert($booking instanceof Booking);
+                
+                $hotel = Hotel::find($booking->hotel_id);
+                $room = Room::find($booking->room_id);
+                $offer = Offer::find($booking->offer_id);
+
+                $bookingsWithDetails[] = [
+                    'booking' => $booking,
+                    'hotel' => $hotel,
+                    'room' => $room,
+                    'offer' => $offer,
+                ];
+            }
+
+            return JsonResponse::ok([
+                'bookings' => $bookingsWithDetails,
+            ]);
+        }
+
+        // Otherwise, get a specific booking
         $booking = Booking::find($this->booking_id);
 
         if (!$booking instanceof Booking) {
@@ -37,7 +73,7 @@ class BookingController extends Controller
         }
 
         // Verify the booking belongs to the authenticated user
-        if ($booking->user_id !== ($this->request->user['id'] ?? '')) {
+        if ($booking->user_id !== $userId) {
             return JsonResponse::error('Unauthorized', 403);
         }
 
