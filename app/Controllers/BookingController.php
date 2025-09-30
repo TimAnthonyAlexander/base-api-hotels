@@ -37,11 +37,14 @@ class BookingController extends Controller
         }
 
         // If no booking_id is provided, list all bookings
-        if ($this->booking_id === '' || $this->booking_id === '0') {
-            // Get all bookings for this user, ordered by newest first
-            $bookings = Booking::where('user_id', '=', $userId)
-                ->orderBy('created_at', 'DESC')
-                ->get();
+        if (empty($this->booking_id)) {
+            // Get all bookings for this user
+            $bookings = Booking::where('user_id', '=', $userId)->get();
+
+            // Sort by created_at descending (newest first)
+            usort($bookings, function($a, $b) {
+                return strtotime($b->created_at) - strtotime($a->created_at);
+            });
 
             // Load related data for each booking
             $bookingsWithDetails = [];
