@@ -152,27 +152,12 @@ $descClosers = [
     'that balances comfort and utility.'
 ];
 
-$hotelsTarget = 1000;
+$locationsPerCity = 5;
+$hotelsPerLocation = 10;
 $roomsPerHotelMin = 7;
 $roomsPerHotelMax = 15;
 $offersPerRoomMin = 2;
 $offersPerRoomMax = 6;
-
-$randCountry = static function (array $countries): array {
-    $countryKeys = array_keys($countries);
-    if (!$countryKeys) {
-        throw new RuntimeException('No countries configured');
-    }
-    $country = $countryKeys[array_rand($countryKeys)];
-
-    $cities = $countries[$country] ?? [];
-    if (!$cities) {
-        throw new RuntimeException("No cities configured for {$country}");
-    }
-    $city = $cities[array_rand($cities)];
-
-    return [$country, $city];
-};
 
 $pick = static function (array $arr) use ($faker) {
     return $faker->randomElement($arr);
@@ -209,74 +194,79 @@ $hotelsCreated = 0;
 $roomsCreated = 0;
 $offersCreated = 0;
 
-for ($i = 0; $i < $hotelsTarget; $i++) {
-    [$country, $city] = $randCountry($countries);
+$allCityTuples = [];
+foreach ($countries as $country => $cities) {
+    foreach ($cities as $city) {
+        $allCityTuples[] = [$country, $city];
+    }
+}
 
-    $location = new Location();
-    $location->name = $pick($locationQualifiers);
-    $location->city = $city;
-    $location->country = $country;
-    $location->latitude = (float)$faker->latitude();
-    $location->longitude = (float)$faker->longitude();
-    $location->save();
+foreach ($allCityTuples as [$country, $city]) {
+    $qualifiers = array_values(array_unique($faker->randomElements($locationQualifiers, $locationsPerCity)));
+    foreach ($qualifiers as $qual) {
+        $location = new Location();
+        $location->name = $qual;
+        $location->city = $city;
+        $location->country = $country;
+        $location->latitude = (float)$faker->latitude();
+        $location->longitude = (float)$faker->longitude();
+        $location->save();
 
-    $hotel = new Hotel();
-    $hotel->title = $mkTitle($city);
-    $hotel->description = $mkDesc($city);
-    $hotel->location_id = $location->id;
-    $hotel->star_rating = random_int(2, 5);
-    $hotel->save();
-    $hotelsCreated++;
+        for ($h = 0; $h < $hotelsPerLocation; $h++) {
+            $hotel = new Hotel();
+            $hotel->title = $mkTitle($city);
+            $hotel->description = $mkDesc($city);
+            $hotel->location_id = $location->id;
+            $hotel->star_rating = random_int(2, 5);
+            $hotel->save();
+            $hotelsCreated++;
 
-    $roomsCount = random_int($roomsPerHotelMin, $roomsPerHotelMax);
-    for ($r = 0; $r < $roomsCount; $r++) {
-        $category = $pick($roomCategories);
-        $capacity = random_int(1, 6);
+            $roomsCount = random_int($roomsPerHotelMin, $roomsPerHotelMax);
+            for ($r = 0; $r < $roomsCount; $r++) {
+                $category = $pick($roomCategories);
+                $capacity = random_int(1, 6);
 
-        $room = new Room();
-        $room->hotel_id = $hotel->id;
-        $room->category = $category;
-        $room->description = $faker->sentence(10);
-        $room->capacity = $capacity; // Already set above to random_int(1, 6)
-        $room->save();
-        $roomsCreated++;
+                $room = new Room();
+                $room->hotel_id = $hotel->id;
+                $room->category = $category;
+                $room->description = $faker->sentence(10);
+                $room->capacity = $capacity;
+                $room->save();
+                $roomsCreated++;
 
-        $offersCount = random_int($offersPerRoomMin, $offersPerRoomMax);
-        for ($o = 0; $o < $offersCount; $o++) {
-            $price = $calcPrice($hotel->star_rating, $capacity, $category);
-            if ($o > 0) {
-                $price = round($price + random_int(-15, 25), 2);
-            }
+                $offersCount = random_int($offersPerRoomMin, $offersPerRoomMax);
+                for ($o = 0; $o < $offersCount; $o++) {
+                    $price = $calcPrice($hotel->star_rating, $capacity, $category);
+                    if ($o > 0) {
+                        $price = round($price + random_int(-15, 25), 2);
+                    }
 
-            // Generate realistic date ranges with proper constraints (ensuring ends_on > starts_on)
-            if ($o === 0 && random_int(1, 3) === 1) {
-                // 33% chance first offer starts in the past and is still active (overlaps today)
-                $startDate = $faker->dateTimeBetween('-2 months', 'now');
-                $endDate = (clone $startDate)->modify('+' . random_int(7, 60) . ' days');
-                // Ensure it extends beyond today
-                if ($endDate <= new \DateTime('now')) {
-                    $endDate = (new \DateTime('now'))->modify('+' . random_int(1, 30) . ' days');
+                    if ($o === 0 && random_int(1, 3) === 1) {
+                        $startDate = $faker->dateTimeBetween('-2 months', 'now');
+                        $endDate = (clone $startDate)->modify('+' . random_int(7, 60) . ' days');
+                        if ($endDate <= new \DateTime('now')) {
+                            $endDate = (new \DateTime('now'))->modify('+' . random_int(1, 30) . ' days');
+                        }
+                    } elseif (random_int(1, 4) === 1) {
+                        $startDate = $faker->dateTimeBetween('now', '+3 days');
+                        $endDate = (clone $startDate)->modify('+' . random_int(1, 60) . ' days');
+                    } else {
+                        $startDate = $faker->dateTimeBetween('+1 week', '+6 months');
+                        $endDate = (clone $startDate)->modify('+' . random_int(1, 90) . ' days');
+                    }
+
+                    $offer = new Offer();
+                    $offer->room_id = $room->id;
+                    $offer->price = (float)$price;
+                    $offer->discount = max(0.0, round($price * (random_int(0, 20) / 100.0), 2));
+                    $offer->effective_price = round($offer->price - $offer->discount, 2);
+                    $offer->availability = (bool) (random_int(1, 10) > 2);
+                    $offer->starts_on = $startDate->format('Y-m-d');
+                    $offer->ends_on = $endDate->format('Y-m-d');
+                    $offer->save();
+                    $offersCreated++;
                 }
-            } elseif (random_int(1, 4) === 1) {
-                // 25% chance offer starts today or very soon (next few days)
-                $startDate = $faker->dateTimeBetween('now', '+3 days');
-                $endDate = (clone $startDate)->modify('+' . random_int(1, 60) . ' days');
-            } else {
-                // Rest start in the future
-                $startDate = $faker->dateTimeBetween('+1 week', '+6 months');
-                $endDate = (clone $startDate)->modify('+' . random_int(1, 90) . ' days');
             }
-
-            $offer = new Offer();
-            $offer->room_id = $room->id;
-            $offer->price = (float)$price;
-            $offer->discount = max(0.0, round($price * (random_int(0, 20) / 100.0), 2));
-            $offer->effective_price = round($offer->price - $offer->discount, 2);
-            $offer->availability = (bool) (random_int(1, 10) > 2); // 80% availability rate
-            $offer->starts_on = $startDate->format('Y-m-d');
-            $offer->ends_on = $endDate->format('Y-m-d');
-            $offer->save();
-            $offersCreated++;
         }
     }
 }
