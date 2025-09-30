@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+# Hotel Comparison Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern, minimalistic hotel comparison website built with React, TypeScript, Material-UI, and React Router.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Search Page**: Beautiful landing page with search form for hotels
+- **Results Page**: List view of available hotels with pricing
+- **Hotel Detail Page**: Detailed view of rooms and offers for each hotel
+- **Real-time Updates**: Automatic polling for search results
+- **Session Management**: Automatic session handling with the BaseAPI backend
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 19** - Modern React with hooks
+- **TypeScript** - Type-safe development
+- **Material-UI** - Component library for modern UI
+- **React Router** - Client-side routing
+- **Vite** - Fast build tool and dev server
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── lib/
+│   └── api.ts              # API client with session management
+├── pages/
+│   ├── SearchPage.tsx      # Search form page
+│   ├── ResultsPage.tsx     # Hotel results list
+│   └── HotelDetailPage.tsx # Hotel details with rooms
+├── App.tsx                 # Main app with routing
+├── main.tsx                # Entry point
+└── index.css               # Global styles
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## API Integration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The application connects to the BaseAPI backend running on `http://localhost:6953`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Key Features:
+
+- **Session Management**: Automatically stores and sends `BASEAPISESSID` cookie
+- **Type Safety**: TypeScript interfaces match API responses
+- **Error Handling**: Graceful error messages throughout
+- **Real-time Search**: Polls for results every 2 seconds until complete
+
+## Routes
+
+- `/` - Search page
+- `/search/:searchId` - Results page with hotel list
+- `/search/:searchId/hotel/:hotelId` - Hotel detail page
+
+## Design
+
+The design follows Apple's design language:
+
+- **Minimalistic**: Clean white backgrounds with strategic use of color
+- **Modern Typography**: System fonts with careful weight and spacing
+- **Smooth Animations**: Subtle transitions and hover effects
+- **Gradient Accents**: Purple gradient used for CTAs and highlights
+- **Card-based UI**: Elevated cards with subtle shadows
+- **Responsive**: Works on all screen sizes
+
+## Development
+
+The dev server should already be running. If not:
+
+```bash
+npm run dev
 ```
+
+Visit `http://localhost:5173` to view the application.
+
+## Usage Flow
+
+1. Enter search criteria on the home page:
+   - Location ID (UUID)
+   - Check-in date (YYYY-MM-DD)
+   - Check-out date (YYYY-MM-DD)
+   - Number of guests (1-12)
+
+2. View search results with hotels sorted by best price
+
+3. Click on a hotel to see detailed room information with all available offers
+
+4. Each offer shows:
+   - Original price (if discounted)
+   - Discount percentage
+   - Effective price
+   - Validity dates
+   - Best deal highlighted
