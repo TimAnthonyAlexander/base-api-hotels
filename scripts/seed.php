@@ -152,11 +152,11 @@ $descClosers = [
     'that balances comfort and utility.'
 ];
 
-$hotelsTarget = 60;
-$roomsPerHotelMin = 5;
-$roomsPerHotelMax = 12;
-$offersPerRoomMin = 1;
-$offersPerRoomMax = 3;
+$hotelsTarget = 1000;
+$roomsPerHotelMin = 7;
+$roomsPerHotelMax = 15;
+$offersPerRoomMin = 2;
+$offersPerRoomMax = 6;
 
 $randCountry = static function (array $countries): array {
     $countryKeys = array_keys($countries);
