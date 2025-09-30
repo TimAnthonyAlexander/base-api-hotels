@@ -270,6 +270,30 @@ php mason serve
 
 The API will be available at `http://localhost:7879`
 
+#### Alternative: Import Real Data from CSV
+
+Instead of using the faker-generated seed data, you can import real hotel data from CSV files using the provider infrastructure:
+
+```bash
+# Import from CSV files (locations, hotels, rooms, offers)
+php scripts/import.php csv data/imports
+```
+
+**CSV File Format:**
+
+The CSV provider expects 4 files in the data directory:
+
+- **locations.csv**: `name`, `city`, `country`, `latitude`, `longitude`
+- **hotels.csv**: `title`, `description`, `location_name`, `star_rating`
+- **rooms.csv**: `hotel_title`, `category`, `description`, `capacity`
+- **offers.csv**: `hotel_title`, `room_category`, `price`, `discount`, `availability`, `starts_on`, `ends_on`
+
+Example CSV files are provided in `data/imports/` for reference. The import script:
+- Checks for duplicates and skips existing records
+- Imports in dependency order: locations → hotels → rooms → offers
+- Warns about missing references (e.g., a hotel referencing a non-existent location)
+- Is extensible for future providers (BookingProvider, APIProvider, etc.)
+
 ### Frontend Setup
 
 ```bash
