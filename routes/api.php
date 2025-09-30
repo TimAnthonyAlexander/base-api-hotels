@@ -10,6 +10,7 @@ use App\Controllers\OpenApiController;
 use App\Controllers\ApiTokenController;
 use App\Controllers\SearchController;
 use App\Controllers\LocationAutocompleteController;
+use App\Controllers\BookingController;
 use BaseApi\Http\Middleware\RateLimitMiddleware;
 use App\Middleware\CombinedAuthMiddleware;
 
@@ -89,6 +90,18 @@ $router->post('/search', [
     CombinedAuthMiddleware::class,
     RateLimitMiddleware::class => ['limit' => '30/1h'],
     SearchController::class,
+]);
+
+// Booking management
+$router->get('/bookings/{booking_id}', [
+    CombinedAuthMiddleware::class,
+    BookingController::class,
+]);
+
+$router->post('/bookings', [
+    CombinedAuthMiddleware::class,
+    RateLimitMiddleware::class => ['limit' => '20/1h'],
+    BookingController::class,
 ]);
 
 if (App::config('app.env') === 'local') {

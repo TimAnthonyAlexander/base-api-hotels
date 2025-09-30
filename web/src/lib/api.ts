@@ -120,6 +120,20 @@ class ApiClient {
     async autocompleteLocations(query: string): Promise<ApiResponse<{ locations: LocationOption[] }>> {
         return this.get(`/locations/autocomplete?query=${encodeURIComponent(query)}`);
     }
+
+    // Booking endpoints
+    async createBooking(params: {
+        search_id: string;
+        hotel_id: string;
+        room_id: string;
+        offer_id: string;
+    }): Promise<ApiResponse<{ booking_id: string; booking: Booking }>> {
+        return this.post('/bookings', params);
+    }
+
+    async getBooking(bookingId: string): Promise<ApiResponse<BookingDetail>> {
+        return this.get(`/bookings/${bookingId}`);
+    }
 }
 
 // Types based on API responses
@@ -180,6 +194,30 @@ export interface LocationOption {
     city: string;
     country: string;
     label: string;
+}
+
+export interface Booking {
+    id: string;
+    user_id: string;
+    search_id: string;
+    hotel_id: string;
+    room_id: string;
+    offer_id: string;
+    status: string;
+    starts_on: string;
+    ends_on: string;
+    capacity: number;
+    total_price: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface BookingDetail {
+    booking: Booking;
+    hotel: Hotel;
+    room: Room;
+    offer: Offer;
+    search: Search;
 }
 
 export const apiClient = new ApiClient();

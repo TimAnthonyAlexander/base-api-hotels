@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import SearchPage from './pages/SearchPage';
 import ResultsPage from './pages/ResultsPage';
 import HotelDetailPage from './pages/HotelDetailPage';
+import BookingDetailPage from './pages/BookingDetailPage';
 import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 
@@ -67,6 +68,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/search/:searchId" element={<ResultsPage />} />
           <Route path="/search/:searchId/hotel/:hotelId" element={<HotelDetailPage />} />
+          <Route path="/booking/:bookingId" element={<BookingDetailPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

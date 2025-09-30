@@ -40,6 +40,7 @@ export default function HotelDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [bookingLoading, setBookingLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -82,6 +83,24 @@ export default function HotelDetailPage() {
       navigate('/');
     } catch (err) {
       console.error('Logout failed:', err);
+    }
+  };
+
+  const handleBooking = async (roomId: string, offerId: string) => {
+    if (!searchId || !hotelId) return;
+
+    setBookingLoading(offerId);
+    try {
+      const response = await apiClient.createBooking({
+        search_id: searchId,
+        hotel_id: hotelId,
+        room_id: roomId,
+        offer_id: offerId,
+      });
+      navigate(`/booking/${response.data.booking_id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create booking');
+      setBookingLoading(null);
     }
   };
 
@@ -592,7 +611,9 @@ export default function HotelDetailPage() {
                               </Typography>
                             </Box>
                             <Button
-                              endIcon={<ArrowForward />}
+                              endIcon={bookingLoading === offer.id ? null : <ArrowForward />}
+                              onClick={() => handleBooking(room.id, offer.id)}
+                              disabled={!!bookingLoading}
                               sx={{
                                 textTransform: 'none',
                                 fontWeight: 600,
@@ -605,9 +626,16 @@ export default function HotelDetailPage() {
                                 '&:hover': {
                                   bgcolor: '#00244d',
                                 },
+                                '&:disabled': {
+                                  bgcolor: '#ccc',
+                                },
                               }}
                             >
-                              Book
+                              {bookingLoading === offer.id ? (
+                                <CircularProgress size={20} sx={{ color: 'white' }} />
+                              ) : (
+                                'Book'
+                              )}
                             </Button>
                           </Box>
                         </Box>
