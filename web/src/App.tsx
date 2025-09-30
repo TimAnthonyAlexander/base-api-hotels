@@ -3,6 +3,8 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import SearchPage from './pages/SearchPage';
 import ResultsPage from './pages/ResultsPage';
 import HotelDetailPage from './pages/HotelDetailPage';
+import SignupPage from './pages/SignupPage';
+import LoginPage from './pages/LoginPage';
 
 const theme = createTheme({
   palette: {
@@ -61,6 +63,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<SearchPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/search/:searchId" element={<ResultsPage />} />
           <Route path="/search/:searchId/hotel/:hotelId" element={<HotelDetailPage />} />
         </Routes>

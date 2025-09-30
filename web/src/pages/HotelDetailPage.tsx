@@ -27,12 +27,31 @@ import {
 } from '@mui/icons-material';
 import { apiClient, type Hotel, type SearchResult, type Room } from '../lib/api';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function HotelDetailPage() {
   const { searchId, hotelId } = useParams<{ searchId: string; hotelId: string }>();
   const navigate = useNavigate();
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await apiClient.getMe();
+        setUser(response.data.user);
+      } catch (err) {
+        setUser(null);
+      }
+    };
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const fetchHotel = async () => {
@@ -55,6 +74,16 @@ export default function HotelDetailPage() {
 
     fetchHotel();
   }, [searchId, hotelId]);
+
+  const handleLogout = async () => {
+    try {
+      await apiClient.logout();
+      setUser(null);
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   if (loading) {
     return (
@@ -130,20 +159,61 @@ export default function HotelDetailPage() {
         }}
       >
         <Container maxWidth="lg">
-          <Button
-            startIcon={<ArrowBack />}
-            onClick={() => navigate(`/search/${searchId}`)}
+          <Box
             sx={{
-              color: '#003580',
-              textTransform: 'none',
-              fontWeight: 600,
-              '&:hover': {
-                bgcolor: 'rgba(0, 53, 128, 0.04)',
-              },
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            Back to results
-          </Button>
+            <Button
+              startIcon={<ArrowBack />}
+              onClick={() => navigate(`/search/${searchId}`)}
+              sx={{
+                color: '#003580',
+                textTransform: 'none',
+                fontWeight: 600,
+                '&:hover': {
+                  bgcolor: 'rgba(0, 53, 128, 0.04)',
+                },
+              }}
+            >
+              Back to results
+            </Button>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              {user && (
+                <>
+                  <Typography
+                    sx={{
+                      color: '#666',
+                      fontWeight: 500,
+                      fontSize: '0.95rem',
+                      display: { xs: 'none', sm: 'block' },
+                    }}
+                  >
+                    {user.name}
+                  </Typography>
+                  <Button
+                    onClick={handleLogout}
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderColor: '#003580',
+                      color: '#003580',
+                      '&:hover': {
+                        bgcolor: 'rgba(0, 53, 128, 0.04)',
+                        borderColor: '#003580',
+                      },
+                    }}
+                  >
+                    Log out
+                  </Button>
+                </>
+              )}
+            </Box>
+          </Box>
         </Container>
       </Box>
 

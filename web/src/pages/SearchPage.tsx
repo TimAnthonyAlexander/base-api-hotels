@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   Container,
   Box,
@@ -133,6 +133,12 @@ const partnerLogos = [
   'Kayak',
 ];
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function SearchPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -147,6 +153,33 @@ export default function SearchPage() {
   const [locationInputValue, setLocationInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await apiClient.getMe();
+        setUser(response.data.user);
+      } catch (err) {
+        // User not authenticated, keep user as null
+        setUser(null);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await apiClient.logout();
+      setUser(null);
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   // Debounced location search
   const searchLocations = async (query: string) => {
@@ -204,6 +237,7 @@ export default function SearchPage() {
           minHeight: { xs: '75vh', md: '65vh' },
           background: 'linear-gradient(135deg, rgba(0, 53, 128, 0.85) 0%, rgba(102, 126, 234, 0.9) 100%)',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           py: { xs: 4, md: 8 },
@@ -233,6 +267,120 @@ export default function SearchPage() {
           },
         }}
       >
+        {/* Top Navigation Bar */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 3,
+            py: 2,
+          }}
+        >
+          <Container maxWidth="lg">
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: 'white',
+                  fontSize: '1.25rem',
+                }}
+              >
+                Hotel Comparison
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                {!userLoading && (
+                  <>
+                    {user ? (
+                      // Logged in state
+                      <>
+                        <Typography
+                          sx={{
+                            color: 'rgba(255, 255, 255, 0.95)',
+                            fontWeight: 500,
+                            fontSize: '1rem',
+                            display: { xs: 'none', sm: 'block' },
+                          }}
+                        >
+                          Welcome, {user.name}
+                        </Typography>
+                        <Button
+                          onClick={handleLogout}
+                          sx={{
+                            color: 'white',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            px: 3,
+                            borderRadius: 2,
+                            border: '1px solid rgba(255, 255, 255, 0.3)',
+                            '&:hover': {
+                              bgcolor: 'rgba(255, 255, 255, 0.1)',
+                              borderColor: 'rgba(255, 255, 255, 0.5)',
+                            },
+                          }}
+                        >
+                          Log out
+                        </Button>
+                      </>
+                    ) : (
+                      // Logged out state
+                      <>
+                        <Button
+                          component={RouterLink}
+                          to="/login"
+                          sx={{
+                            color: 'white',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            px: 2,
+                            borderRadius: 2,
+                            '&:hover': {
+                              bgcolor: 'rgba(255, 255, 255, 0.1)',
+                            },
+                          }}
+                        >
+                          Log in
+                        </Button>
+                        <Button
+                          component={RouterLink}
+                          to="/signup"
+                          variant="contained"
+                          sx={{
+                            bgcolor: 'white',
+                            color: '#003580',
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            fontSize: '1rem',
+                            px: 3,
+                            borderRadius: 2,
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                            '&:hover': {
+                              bgcolor: 'rgba(255, 255, 255, 0.95)',
+                              boxShadow: '0 6px 16px rgba(0, 0, 0, 0.25)',
+                            },
+                          }}
+                        >
+                          Sign up
+                        </Button>
+                      </>
+                    )}
+                  </>
+                )}
+              </Box>
+            </Box>
+          </Container>
+        </Box>
+
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
           <Box sx={{ textAlign: 'center', mb: 5 }}>
             <Typography

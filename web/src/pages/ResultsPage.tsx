@@ -19,12 +19,31 @@ import { Hotel as HotelIcon, Star, ArrowForward, CalendarToday, People } from '@
 import { apiClient, type Hotel, type SearchResult } from '../lib/api';
 import SearchForm, { type SearchFormData } from '../components/SearchForm';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function ResultsPage() {
   const { searchId } = useParams<{ searchId: string }>();
   const navigate = useNavigate();
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await apiClient.getMe();
+        setUser(response.data.user);
+      } catch (err) {
+        setUser(null);
+      }
+    };
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -45,6 +64,16 @@ export default function ResultsPage() {
 
     return () => clearInterval(interval);
   }, [searchId]);
+
+  const handleLogout = async () => {
+    try {
+      await apiClient.logout();
+      setUser(null);
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   const getBestPrice = (hotel: Hotel): number => {
     let minPrice = Infinity;
@@ -129,17 +158,58 @@ export default function ResultsPage() {
         }}
       >
         <Container maxWidth="lg">
-          <Typography
-            variant="h6"
+          <Box
             sx={{
-              fontWeight: 700,
-              color: '#003580',
-              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
-            onClick={() => navigate('/')}
           >
-            Hotel Comparison
-          </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                color: '#003580',
+                cursor: 'pointer',
+              }}
+              onClick={() => navigate('/')}
+            >
+              Hotel Comparison
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              {user && (
+                <>
+                  <Typography
+                    sx={{
+                      color: '#666',
+                      fontWeight: 500,
+                      fontSize: '0.95rem',
+                      display: { xs: 'none', sm: 'block' },
+                    }}
+                  >
+                    {user.name}
+                  </Typography>
+                  <Button
+                    onClick={handleLogout}
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderColor: '#003580',
+                      color: '#003580',
+                      '&:hover': {
+                        bgcolor: 'rgba(0, 53, 128, 0.04)',
+                        borderColor: '#003580',
+                      },
+                    }}
+                  >
+                    Log out
+                  </Button>
+                </>
+              )}
+            </Box>
+          </Box>
         </Container>
       </Box>
 
