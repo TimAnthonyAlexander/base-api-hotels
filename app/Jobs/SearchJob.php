@@ -75,48 +75,50 @@ class SearchJob extends Job
             assert($hotel instanceof Hotel);
 
             $hotelArray = $hotel->toArray();
-            // Load all rooms and filter by capacity in PHP  
-            $allRooms = $hotel->rooms()->get();
-            $rooms = array_filter($allRooms, function($room): bool {
-                assert($room instanceof Room);
-                return $room->capacity >= $this->search->capacity;
-            });
 
-            $roomData = [];
+            /** @var Room[] $unfilteredRooms */
+            $unfilteredRooms = $hotel->rooms()->get();
 
-            foreach ($rooms as $room) {
-                assert($room instanceof Room);
-
-                $roomArray = $room->toArray();
-                
-                // Load all offers and filter in PHP (BaseAPI doesn't support where() on relations)
-                $allOffers = $room->offers()->get();
-                $offers = array_filter($allOffers, function($offer): bool {
-                    assert($offer instanceof Offer);
-                    return $offer->availability && 
-                           $offer->starts_on <= $this->search->starts_on && 
-                           $offer->ends_on >= $this->search->ends_on;
-                });
-
-                // Skip room if no valid offers after initial filtering
-                if ($offers === []) {
-                    continue;
-                }
-
-                // Apply additional date containment logic for proper hotel booking semantics
-                $validOffers = $this->validateOfferDates($offers);
-
-                // Skip room if no offers pass the containment check
-                if ($validOffers === []) {
-                    continue;
-                }
-
-                $roomArray['offers'] = $this->sortOffersByPrice($validOffers);
-
-                $roomData[] = $roomArray;
+            $rooms = array_values(array_filter($unfilteredRooms, fn(Room $room): bool => $room->capacity >= $this->search->capacity));
+            if ($rooms === []) {
+                continue;
             }
 
-            // Skip hotel if no valid rooms
+            // Batch-fetch all offers for kept rooms in single query to eliminate N+1
+            $roomIds = array_map(fn($r): string => $r->id, $rooms);
+
+            $offers = Offer::query()
+                ->whereIn('room_id', $roomIds)
+                ->where('availability', '=', true)
+                ->where('starts_on', '<=', $this->search->starts_on)
+                ->where('ends_on', '>=', $this->search->ends_on)
+                ->get();
+
+            // Bucket offers by room_id
+            $byRoom = [];
+            foreach ($offers as $o) {
+                $byRoom[$o->room_id][] = $o;
+            }
+
+            $roomData = [];
+            foreach ($rooms as $room) {
+                $candidates = $byRoom[$room->id] ?? [];
+
+                // Apply date containment logic (cheap prefilter above, precise logic here)
+                $valid = array_values(array_filter(
+                    $candidates,
+                    fn($o): bool => $this->offerCoversStay($o->starts_on, $o->ends_on, $this->search->starts_on, $this->search->ends_on)
+                ));
+
+                if ($valid === []) {
+                    continue;
+                }
+
+                $r = $room->toArray();
+                $r['offers'] = $this->sortOffersByPrice($valid);
+                $roomData[] = $r;
+            }
+
             if ($roomData === []) {
                 continue;
             }
@@ -157,7 +159,7 @@ class SearchJob extends Job
      * Check if offer covers the entire requested stay period
      * Uses proper hotel booking semantics with half-open intervals [start, end)
      */
-     protected function offerCoversStay(string $offerStart, string $offerEnd, string $searchStart, string $searchEnd): bool
+    protected function offerCoversStay(string $offerStart, string $offerEnd, string $searchStart, string $searchEnd): bool
     {
         $dateTimeZone = new DateTimeZone('UTC');
 
@@ -182,15 +184,24 @@ class SearchJob extends Job
     }
 
     /**
-     * Sort hotels by cheapest effective price across all their offers
+     * Sort hotels by cheapest effective price across all their offers with stable secondary sort by ID
      */
     protected function sortHotelsByCheapestPrice(array $hotels): array
     {
-        usort($hotels, function ($hotelA, $hotelB): int {
+        usort($hotels, function (array $hotelA, array $hotelB): int {
             $minPriceA = $this->getHotelMinPrice($hotelA);
             $minPriceB = $this->getHotelMinPrice($hotelB);
 
-            return $minPriceA <=> $minPriceB;
+            // Primary sort by minimum price
+            $priceCmp = $minPriceA <=> $minPriceB;
+            if ($priceCmp !== 0) {
+                return $priceCmp;
+            }
+
+            // Secondary sort by hotel ID for deterministic output on price ties
+            $idA = $hotelA['id'];
+            $idB = $hotelB['id'];
+            return $idA <=> $idB;
         });
 
         return $hotels;
@@ -214,7 +225,7 @@ class SearchJob extends Job
     }
 
     /**
-     * Sort offers by effective price (cheapest first)
+     * Sort offers by effective price (cheapest first) with stable secondary sort by ID
      */
     protected function sortOffersByPrice(array $offers): array
     {
@@ -222,22 +233,40 @@ class SearchJob extends Job
             $priceA = is_array($offerA) ? $offerA['effective_price'] : $offerA->effective_price;
             $priceB = is_array($offerB) ? $offerB['effective_price'] : $offerB->effective_price;
 
-            return $priceA <=> $priceB;
+            // Primary sort by price
+            $priceCmp = $priceA <=> $priceB;
+            if ($priceCmp !== 0) {
+                return $priceCmp;
+            }
+
+            // Secondary sort by ID for deterministic output on price ties
+            $idA = is_array($offerA) ? $offerA['id'] : $offerA->id;
+            $idB = is_array($offerB) ? $offerB['id'] : $offerB->id;
+            return $idA <=> $idB;
         });
 
         return $offers;
     }
 
     /**
-     * Sort rooms by their cheapest offer (cheapest first)
+     * Sort rooms by their cheapest offer (cheapest first) with stable secondary sort by ID
      */
     protected function sortRoomsByCheapestOffer(array $rooms): array
     {
-        usort($rooms, function ($roomA, $roomB): int {
+        usort($rooms, function (array $roomA, array $roomB): int {
             $minPriceA = $this->getRoomMinPrice($roomA);
             $minPriceB = $this->getRoomMinPrice($roomB);
 
-            return $minPriceA <=> $minPriceB;
+            // Primary sort by minimum price
+            $priceCmp = $minPriceA <=> $minPriceB;
+            if ($priceCmp !== 0) {
+                return $priceCmp;
+            }
+
+            // Secondary sort by room ID for deterministic output on price ties
+            $idA = $roomA['id'];
+            $idB = $roomB['id'];
+            return $idA <=> $idB;
         });
 
         return $rooms;

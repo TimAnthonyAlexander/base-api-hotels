@@ -254,8 +254,8 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
                 $startDate = $faker->dateTimeBetween('-2 months', 'now');
                 $endDate = (clone $startDate)->modify('+' . random_int(7, 60) . ' days');
                 // Ensure it extends beyond today
-                if ($endDate <= new DateTime('now')) {
-                    $endDate = (new DateTime('now'))->modify('+' . random_int(1, 30) . ' days');
+                if ($endDate <= new \DateTime('now')) {
+                    $endDate = (new \DateTime('now'))->modify('+' . random_int(1, 30) . ' days');
                 }
             } elseif (random_int(1, 4) === 1) {
                 // 25% chance offer starts today or very soon (next few days)
@@ -272,7 +272,7 @@ for ($i = 0; $i < $hotelsTarget; $i++) {
             $offer->price = (float)$price;
             $offer->discount = max(0.0, round($price * (random_int(0, 20) / 100.0), 2));
             $offer->effective_price = round($offer->price - $offer->discount, 2);
-            $offer->availability = random_int(1, 10) > 2; // 80% availability rate
+            $offer->availability = (bool) (random_int(1, 10) > 2); // 80% availability rate
             $offer->starts_on = $startDate->format('Y-m-d');
             $offer->ends_on = $endDate->format('Y-m-d');
             $offer->save();
