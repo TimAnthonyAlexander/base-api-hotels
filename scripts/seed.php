@@ -152,8 +152,7 @@ $descClosers = [
     'that balances comfort and utility.'
 ];
 
-$locationsPerCity = 5;
-$hotelsPerLocation = 10;
+$hotelsPerCity = 50;
 $roomsPerHotelMin = 7;
 $roomsPerHotelMax = 15;
 $offersPerRoomMin = 2;
@@ -202,24 +201,24 @@ foreach ($countries as $country => $cities) {
 }
 
 foreach ($allCityTuples as [$country, $city]) {
-    $qualifiers = array_values(array_unique($faker->randomElements($locationQualifiers, $locationsPerCity)));
-    foreach ($qualifiers as $qual) {
-        $location = new Location();
-        $location->name = $qual;
-        $location->city = $city;
-        $location->country = $country;
-        $location->latitude = (float)$faker->latitude();
-        $location->longitude = (float)$faker->longitude();
-        $location->save();
+    // Create one location per city
+    $location = new Location();
+    $location->name = $city;
+    $location->city = $city;
+    $location->country = $country;
+    $location->latitude = (float)$faker->latitude();
+    $location->longitude = (float)$faker->longitude();
+    $location->save();
 
-        for ($h = 0; $h < $hotelsPerLocation; $h++) {
-            $hotel = new Hotel();
-            $hotel->title = $mkTitle($city);
-            $hotel->description = $mkDesc($city);
-            $hotel->location_id = $location->id;
-            $hotel->star_rating = random_int(2, 5);
-            $hotel->save();
-            $hotelsCreated++;
+    // Create multiple hotels for this city location
+    for ($h = 0; $h < $hotelsPerCity; $h++) {
+        $hotel = new Hotel();
+        $hotel->title = $mkTitle($city);
+        $hotel->description = $mkDesc($city);
+        $hotel->location_id = $location->id;
+        $hotel->star_rating = random_int(2, 5);
+        $hotel->save();
+        $hotelsCreated++;
 
             $roomsCount = random_int($roomsPerHotelMin, $roomsPerHotelMax);
             for ($r = 0; $r < $roomsCount; $r++) {
@@ -265,7 +264,6 @@ foreach ($allCityTuples as [$country, $city]) {
                     $offer->ends_on = $endDate->format('Y-m-d');
                     $offer->save();
                     $offersCreated++;
-                }
             }
         }
     }

@@ -51,7 +51,7 @@ class LocationAutocompleteController extends Controller
             'name' => $location->name,
             'city' => $location->city,
             'country' => $location->country,
-            'label' => sprintf('%s, %s, %s', $location->name, $location->city, $location->country),
+            'label' => sprintf('%s, %s', $location->city, $location->country),
         ], $matchedLocations);
 
         return JsonResponse::ok(['locations' => $results]);
