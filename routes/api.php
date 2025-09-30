@@ -9,6 +9,7 @@ use App\Controllers\SignupController;
 use App\Controllers\OpenApiController;
 use App\Controllers\ApiTokenController;
 use App\Controllers\SearchController;
+use App\Controllers\LocationAutocompleteController;
 use BaseApi\Http\Middleware\RateLimitMiddleware;
 use App\Middleware\CombinedAuthMiddleware;
 
@@ -22,6 +23,12 @@ $router = App::router();
 $router->get('/health', [
     RateLimitMiddleware::class => ['limit' => '60/1m'],
     HealthController::class,
+]);
+
+// Location autocomplete
+$router->get('/locations/autocomplete', [
+    RateLimitMiddleware::class => ['limit' => '60/1m'],
+    LocationAutocompleteController::class,
 ]);
 
 // ================================  

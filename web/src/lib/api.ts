@@ -112,6 +112,11 @@ class ApiClient {
   async getSearch(searchId: string): Promise<ApiResponse<SearchResult>> {
     return this.get(`/search/${searchId}`);
   }
+
+  // Location autocomplete
+  async autocompleteLocations(query: string): Promise<ApiResponse<{ locations: LocationOption[] }>> {
+    return this.get(`/locations/autocomplete?query=${encodeURIComponent(query)}`);
+  }
 }
 
 // Types based on API responses
@@ -164,6 +169,14 @@ export interface Search {
 export interface SearchResult {
   search: Search;
   hotels: Hotel[];
+}
+
+export interface LocationOption {
+  id: string;
+  name: string;
+  city: string;
+  country: string;
+  label: string;
 }
 
 export const apiClient = new ApiClient();
