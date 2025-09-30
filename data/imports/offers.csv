@@ -1,0 +1,18 @@
+hotel_title,room_category,price,discount,availability,starts_on,ends_on
+Grand Hotel Vienna,Deluxe,299.00,29.90,true,2025-10-01,2025-12-31
+Grand Hotel Vienna,Deluxe,349.00,0.00,true,2026-01-01,2026-03-31
+Grand Hotel Vienna,Suite,599.00,59.90,true,2025-10-01,2025-12-31
+Grand Hotel Vienna,Suite,649.00,0.00,true,2026-01-01,2026-03-31
+Urban Residence Berlin,Standard,149.00,14.90,true,2025-10-01,2025-12-31
+Urban Residence Berlin,Standard,179.00,0.00,true,2026-01-01,2026-03-31
+Urban Residence Berlin,Superior King,199.00,19.90,true,2025-10-01,2025-12-31
+Urban Residence Berlin,Superior King,229.00,0.00,true,2026-01-01,2026-03-31
+Royal Suites Paris,Junior Suite,399.00,39.90,true,2025-10-01,2025-12-31
+Royal Suites Paris,Junior Suite,449.00,0.00,true,2026-01-01,2026-03-31
+Royal Suites Paris,Executive Suite,799.00,79.90,true,2025-10-01,2025-12-31
+Royal Suites Paris,Executive Suite,849.00,0.00,true,2026-01-01,2026-03-31
+Central Plaza London,Deluxe Twin,249.00,24.90,true,2025-10-01,2025-12-31
+Central Plaza London,Deluxe Twin,299.00,0.00,true,2026-01-01,2026-03-31
+Central Plaza London,King,289.00,28.90,true,2025-10-01,2025-12-31
+Central Plaza London,King,339.00,0.00,true,2026-01-01,2026-03-31
+
