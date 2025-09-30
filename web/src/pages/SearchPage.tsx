@@ -297,8 +297,18 @@ export default function SearchPage() {
             )}
 
             <form onSubmit={handleSubmit}>
-              <Grid container spacing={2} alignItems="flex-start">
-                <Grid item xs={12} md={4}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { 
+                    xs: '1fr',
+                    md: 'repeat(12, 1fr)',
+                  },
+                  gap: 2,
+                  alignItems: 'start',
+                }}
+              >
+                <Box sx={{ gridColumn: { xs: 'span 1', md: 'span 5' } }}>
                   <Autocomplete
                     value={selectedLocation}
                     onChange={(_, newValue) => {
@@ -346,9 +356,9 @@ export default function SearchPage() {
                       />
                     )}
                   />
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} sm={6} md={2.5}>
+                <Box sx={{ gridColumn: { xs: 'span 1', sm: 'span 4', md: 'span 2' } }}>
                   <TextField
                     label="Check-in"
                     type="date"
@@ -362,7 +372,7 @@ export default function SearchPage() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <CalendarToday sx={{ color: '#003580' }} />
+                          <CalendarToday sx={{ color: '#003580', fontSize: 18 }} />
                         </InputAdornment>
                       ),
                     }}
@@ -373,9 +383,9 @@ export default function SearchPage() {
                       },
                     }}
                   />
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} sm={6} md={2.5}>
+                <Box sx={{ gridColumn: { xs: 'span 1', sm: 'span 4', md: 'span 2' } }}>
                   <TextField
                     label="Check-out"
                     type="date"
@@ -389,7 +399,7 @@ export default function SearchPage() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <CalendarToday sx={{ color: '#003580' }} />
+                          <CalendarToday sx={{ color: '#003580', fontSize: 18 }} />
                         </InputAdornment>
                       ),
                     }}
@@ -400,9 +410,9 @@ export default function SearchPage() {
                       },
                     }}
                   />
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} sm={6} md={1.5}>
+                <Box sx={{ gridColumn: { xs: 'span 1', sm: 'span 4', md: 'span 1' } }}>
                   <TextField
                     label="Guests"
                     type="number"
@@ -416,7 +426,7 @@ export default function SearchPage() {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <People sx={{ color: '#003580' }} />
+                          <People sx={{ color: '#003580', fontSize: 18 }} />
                         </InputAdornment>
                       ),
                     }}
@@ -427,9 +437,9 @@ export default function SearchPage() {
                       },
                     }}
                   />
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} sm={6} md={1.5}>
+                <Box sx={{ gridColumn: { xs: 'span 1', md: 'span 2' } }}>
                   <Button
                     type="submit"
                     variant="contained"
@@ -456,8 +466,8 @@ export default function SearchPage() {
                   >
                     {loading ? 'Searching...' : 'Search'}
                   </Button>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </form>
           </Paper>
 
